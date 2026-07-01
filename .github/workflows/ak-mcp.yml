@@ -1,0 +1,56 @@
+name: ak-mcp
+
+# Build, verify, and deploy the AK MCP documentation server.
+# Scoped to mcp-docs-server/** (and the kernel headers it extracts from) so it
+# never runs for firmware-only changes.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mcp-docs-server/**"
+      - "application/sources/ak/inc/**"
+      - ".github/workflows/ak-mcp.yml"
+  pull_request:
+    paths:
+      - "mcp-docs-server/**"
+      - "application/sources/ak/inc/**"
+
+defaults:
+  run:
+    working-directory: mcp-docs-server
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build corpus + drift check
+        run: npm run drift
+      - name: Test (extractor, corpus, search)
+        run: npm test
+      - name: Typecheck (core + cli)
+        run: npm run typecheck
+
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+      - name: Build corpus (bundled into the Worker)
+        run: npm run build:corpus
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: mcp-docs-server
