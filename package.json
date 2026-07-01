@@ -1,0 +1,40 @@
+{
+  "name": "ak-mcp",
+  "version": "0.1.0",
+  "description": "Public MCP documentation server for the AK (Active Kernel) event-driven MCU framework",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ak-mcp": "./dist/cli/bin.js"
+  },
+  "files": [
+    "dist",
+    "generated/corpus.json",
+    "README.md"
+  ],
+  "scripts": {
+    "extract": "node scripts/extract.mjs",
+    "build:corpus": "node scripts/build-corpus.mjs",
+    "drift": "node scripts/build-corpus.mjs --check",
+    "build": "npm run build:corpus && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test",
+    "dev": "wrangler dev",
+    "deploy": "npm run build:corpus && wrangler deploy",
+    "start:stdio": "node dist/cli/bin.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "agents": "^0.0.80",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250510.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

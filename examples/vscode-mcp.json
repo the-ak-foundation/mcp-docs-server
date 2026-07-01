@@ -1,0 +1,9 @@
+{
+  "//": "Copy this to .vscode/mcp.json in your project. Replace <your-account> with your real workers.dev subdomain (see the `wrangler deploy` output or the Cloudflare dashboard).",
+  "servers": {
+    "ak-docs": {
+      "type": "http",
+      "url": "https://ak-mcp.<your-account>.workers.dev/mcp"
+    }
+  }
+}

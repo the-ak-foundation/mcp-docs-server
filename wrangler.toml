@@ -1,0 +1,20 @@
+# Cloudflare Worker config for the AK MCP docs server (remote, public, free tier).
+# Deploy:  npm run deploy   (runs build:corpus, then `wrangler deploy`)
+# Dev:     npm run dev       (local Streamable HTTP at http://localhost:8787/mcp)
+name = "ak-mcp"
+main = "src/worker/index.ts"
+compatibility_date = "2025-03-10"
+compatibility_flags = ["nodejs_compat"]
+
+# McpAgent keeps each MCP session in a Durable Object. SQLite-backed DOs are
+# available on the Workers free plan.
+[[durable_objects.bindings]]
+name = "MCP_OBJECT"
+class_name = "AkMcp"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["AkMcp"]
+
+[observability]
+enabled = true

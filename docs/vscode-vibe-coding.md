@@ -1,0 +1,159 @@
+# Hướng dẫn dùng AK MCP server cho vibe coding trên VS Code
+
+Tài liệu này dành cho **kỹ sư vibe coding**: cách kết nối AK MCP server (đã deploy) vào IDE và dùng nó để AI sinh code firmware AK đúng chuẩn cho **một dự án mới**.
+
+> **AK MCP server** cung cấp cho công cụ AI: tra cứu API kernel (chữ ký + đối số chính xác), các recipe tạo task/driver/screen, và "guardrails" (vùng cấm sửa). Khi AI có nó, code sinh ra bám đúng convention của AK thay vì đoán mò.
+
+---
+
+## 0. Trước khi bắt đầu — lấy URL server
+
+Sau khi `npm run deploy`, Cloudflare in ra URL dạng:
+
+```
+https://ak-mcp.<your-account>.workers.dev
+```
+
+Kiểm tra server sống bằng cách mở URL gốc trên trình duyệt (hoặc `curl`): bạn sẽ thấy trang landing liệt kê endpoint và tool. Endpoint MCP là:
+
+```
+https://ak-mcp.<your-account>.workers.dev/mcp        ← Streamable HTTP (dùng cái này)
+https://ak-mcp.<your-account>.workers.dev/sse        ← SSE (client cũ)
+```
+
+> Thay `<your-account>` bằng subdomain thật của bạn ở **mọi** ví dụ bên dưới.
+
+---
+
+## 1. VS Code + GitHub Copilot (Agent mode) — khuyến nghị
+
+Yêu cầu: **VS Code ≥ 1.102** và extension **GitHub Copilot Chat**. MCP chỉ hoạt động ở **Agent mode**.
+
+### Cách A — qua file `.vscode/mcp.json` (gắn theo dự án)
+
+Tạo file `.vscode/mcp.json` trong thư mục dự án (có sẵn template ở [`examples/vscode-mcp.json`](../examples/vscode-mcp.json)):
+
+```json
+{
+  "servers": {
+    "ak-docs": {
+      "type": "http",
+      "url": "https://ak-mcp.<your-account>.workers.dev/mcp"
+    }
+  }
+}
+```
+
+Lưu file → VS Code hiện nút **Start** ngay trên file đó, bấm để kết nối (lần đầu sẽ hỏi Trust, chọn cho phép).
+
+### Cách B — qua Command Palette (gắn theo user, mọi dự án)
+
+`Ctrl/Cmd + Shift + P` → **MCP: Add Server** → **HTTP** → dán URL `/mcp` → đặt tên `ak-docs` → chọn lưu vào *User* hoặc *Workspace*.
+
+### Bật và kiểm tra
+
+1. Mở **Chat view** (`Ctrl/Cmd + Alt + I`), đổi dropdown chế độ sang **Agent**.
+2. Bấm icon 🔧 (**Tools**) → thấy nhóm `ak-docs` với 5 tool: `search_ak_docs`, `get_ak_api`, `list_ak_api`, `get_ak_guide`, `get_ak_guardrails` → tick bật.
+3. Lệnh **MCP: List Servers** cho biết trạng thái Running/Stopped và xem log nếu lỗi.
+
+---
+
+## 2. Các công cụ khác (cùng dùng được URL trên)
+
+### Cursor
+Tạo `.cursor/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "ak-docs": { "url": "https://ak-mcp.<your-account>.workers.dev/mcp" }
+  }
+}
+```
+Vào **Settings → MCP** để thấy server xanh, rồi chat ở chế độ **Agent**.
+
+### Cline / Roo Code (extension trong VS Code)
+Mở panel extension → icon **MCP Servers** → **Remote Servers** → **Add** → Name `ak-docs`, URL `…/mcp` → **Connect**.
+
+### Claude Code (chạy trong terminal của VS Code)
+```sh
+claude mcp add --transport http ak-docs https://ak-mcp.<your-account>.workers.dev/mcp
+```
+Kiểm tra: `claude mcp list`.
+
+### Chạy offline (không cần mạng) — stdio cục bộ
+Nếu muốn dùng bản local thay vì server remote:
+```sh
+cd mcp-docs-server && npm install && npm run build
+```
+Rồi trỏ client tới lệnh stdio (ví dụ `.vscode/mcp.json`):
+```json
+{
+  "servers": {
+    "ak-docs": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["D:/đường-dẫn/mcp-docs-server/dist/cli/bin.js"]
+    }
+  }
+}
+```
+
+---
+
+## 3. Chạy thử với một dự án mới — từng bước
+
+Giả sử bạn bắt đầu một firmware AK mới (clone/copy từ base kit này, hoặc một nhánh mới).
+
+1. **Mở dự án** trong VS Code.
+2. **Thêm MCP server**: tạo `.vscode/mcp.json` như mục 1, bấm Start.
+3. **"Lái" agent dùng MCP** (rất nên làm): copy [`examples/copilot-instructions.md`](../examples/copilot-instructions.md) vào `.github/copilot-instructions.md` của dự án (Cursor: `.cursor/rules/`; Claude Code: `CLAUDE.md`). File này buộc agent gọi `get_ak_guardrails` / `get_ak_guide` trước khi viết code.
+4. **Bật Agent mode**, tick các tool `ak-docs`.
+5. **Ra prompt** (xem mục 4). Quan sát agent gọi tool (VS Code hiện "Running tool: get_ak_guide…") rồi mới sinh code.
+6. **Duyệt diff**: kiểm tra agent chỉ sửa trong `application/sources/app/` (và `driver/`), không đụng `ak/`, `boot/`, `networks/`, `common/`.
+7. **Build kiểm chứng**: `cd application && make` (xem [CLAUDE.md](../../CLAUDE.md) ở gốc repo về toolchain — cần shell Unix/WSL).
+
+---
+
+## 4. Prompt mẫu cho vibe coding
+
+Cứ mô tả nhu cầu tự nhiên; với steering file ở trên, agent sẽ tự tra MCP. Vài ví dụ:
+
+- > "Tạo một task mới `task_buzzer` kêu bíp 3 lần khi nhận tín hiệu báo động. Theo đúng chuẩn AK."
+  → agent gọi `get_ak_guide("create-task")` + `get_ak_guardrails()` rồi sinh đủ 5 chỗ sửa (`task_list.h/.cpp`, `app.h`, `task_buzzer.cpp`, `Makefile.mk`).
+
+- > "Viết driver cho cảm biến nhiệt qua chân ADC, đưa giá trị về một task mỗi 500ms."
+  → `get_ak_guide("create-driver")` → driver dùng function-pointer injection + wiring BSP + hook polling.
+
+- > "Hàm `timer_set` nhận những tham số gì? Cho ví dụ one-shot 2 giây."
+  → `get_ak_api("timer_set")` trả chữ ký + ngữ nghĩa re-arm + ví dụ.
+
+- > "Tôi muốn màn hình OLED hiển thị đồng hồ, cập nhật mỗi giây."
+  → `get_ak_guide("create-screen")`.
+
+- > "Vì sao firmware reset liên tục với log FATAL 'MT' 0x30?"
+  → `search_ak_docs("MT 0x30 fatal timer")` → hết pool timer, chỉ cách chỉnh `ak.cfg.mk` (`tune-pools`).
+
+**Mẹo:** nếu agent "quên" dùng MCP, ép thẳng: *"Dùng tool ak-docs, gọi get_ak_guide('create-task') trước khi viết."* Trong VS Code có thể tham chiếu tool bằng `#get_ak_guide` ngay trong prompt.
+
+---
+
+## 5. Khắc phục sự cố
+
+| Triệu chứng | Cách xử lý |
+| --- | --- |
+| Không thấy tool trong picker | Đảm bảo đang ở **Agent mode** (không phải Ask/Edit); chạy **MCP: List Servers** xem có Running không. |
+| Server "Stopped"/đỏ | Mở URL gốc trên trình duyệt xem landing page có hiện không; kiểm tra lại đúng đường dẫn `/mcp`. |
+| 404 / không kết nối | Sai URL hoặc thiếu `/mcp`. Streamable HTTP dùng `/mcp`; client chỉ hỗ trợ SSE thì đổi sang `/sse`. |
+| Agent vẫn "chế" API sai | Thêm/đậm hơn steering file (mục 3.3); hoặc yêu cầu trực tiếp gọi `get_ak_api`. |
+| Cần xem log | VS Code: **MCP: List Servers → ak-docs → Show Output**. |
+
+---
+
+## 6. Server này cung cấp gì
+
+- **Tools:** `search_ak_docs`, `get_ak_api`, `list_ak_api`, `get_ak_guide`, `get_ak_guardrails`
+- **Guides:** create-task, create-driver, create-screen, use-timer, isr-bridge, tune-pools
+- **Prompts:** `ak-new-task`, `ak-new-driver` (template scaffolding kèm guardrails)
+- **Resources:** `ak://index`, `ak://{section}/{id}` (concept / guide / guardrail / api)
+
+Chi tiết kiến trúc & cách cập nhật tài liệu: [README.md](../README.md).
