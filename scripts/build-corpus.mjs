@@ -15,7 +15,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { extractAll, AK_INC_DIR } from "./extract.mjs";
+import { extractAll, resolveIncDir } from "./extract.mjs";
 import { tokenize } from "./tokenize.mjs";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -62,7 +62,8 @@ function readDir(section) {
 }
 
 // --- 1. API documents (extracted + enriched) -------------------------------
-const extracted = extractAll();
+const incDir = resolveIncDir();
+const extracted = extractAll(incDir);
 const extractedNames = new Set(extracted.map((e) => e.name));
 const enrichment = new Map();
 for (const { file, meta, body } of readDir("enrichment")) {
@@ -168,7 +169,7 @@ documents.forEach((doc, idx) => {
 const corpus = {
   version: 1,
   generatedAt: new Date().toISOString(),
-  source: { incDir: AK_INC_DIR.replace(/\\/g, "/"), symbols: extracted.length },
+  source: { incDir: incDir.replace(/\\/g, "/"), symbols: extracted.length },
   documents,
   modules,
   sections,

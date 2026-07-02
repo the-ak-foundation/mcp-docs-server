@@ -1,6 +1,6 @@
 # ak-mcp — AK Active Kernel documentation MCP server
 
-A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework in this repo.
+A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework, whose firmware lives in the sibling repo [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151).
 
 It lets an AI assistant:
 
@@ -12,9 +12,10 @@ It lets an AI assistant:
 ## How it works
 
 ```
-application/sources/ak/inc/*.h ──► scripts/extract.mjs ─┐
-corpus/ (hand-written guides,      scripts/build-corpus  ├─► generated/corpus.json
-         guardrails, enrichment) ──────────────────────┘        (docs + BM25 index)
+../ak-base-kit-stm32l151/                                (sibling firmware repo)
+  application/sources/ak/inc/*.h ──► scripts/extract.mjs ─┐
+corpus/ (hand-written guides,        scripts/build-corpus ├─► generated/corpus.json
+         guardrails, enrichment) ───────────────────────┘        (docs + BM25 index)
                                                                       │
                                           src/core (resources + tools + prompts)
                                           ├── src/worker  →  Cloudflare Worker (remote HTTP)
@@ -38,6 +39,32 @@ Signatures come from the kernel headers; semantics/examples are layered on per s
 
 **Resources:** `ak://index`, and `ak://{section}/{id}` for every concept, guide, guardrail, and API entry.
 
+## Repository layout (important)
+
+This repo is **standalone** but its build reads the firmware kernel headers. Clone the
+firmware repo **next to** this one:
+
+```
+<workspace>/
+  ak-base-kit-stm32l151/     # firmware (source of the headers)
+  mcp-docs-server/           # this repo
+```
+
+The header path is auto-resolved in this order (first existing wins):
+
+1. `$AK_INC_DIR` — exact path to `.../application/sources/ak/inc`
+2. `$AK_FIRMWARE_DIR/application/sources/ak/inc` — firmware repo root
+3. `../ak-base-kit-stm32l151/application/sources/ak/inc` — sibling clone (default)
+
+So a side-by-side clone needs no configuration. Otherwise:
+
+```sh
+AK_FIRMWARE_DIR=/path/to/ak-base-kit-stm32l151 npm run build:corpus
+```
+
+Once `generated/corpus.json` is built, the running server (stdio or Worker) needs **nothing**
+from the firmware repo — the corpus is self-contained.
+
 ## Develop
 
 ```sh
@@ -48,7 +75,7 @@ npm test                 # extractor, corpus integrity, and search ranking (no d
 npm run typecheck        # core + cli
 ```
 
-The corpus pipeline (`scripts/*.mjs`) and tests are **zero-dependency** and run on plain Node ≥ 20 — no install required for `npm run build:corpus` / `node --test`.
+The corpus pipeline (`scripts/*.mjs`) and tests are **zero-dependency** and run on plain Node ≥ 20 — no install required for `npm run build:corpus` / `node --test` (only the firmware headers must be reachable as above).
 
 ## Run locally (stdio)
 
@@ -91,7 +118,13 @@ for step-by-step setup (Copilot Agent mode, Cursor, Cline, Claude Code), a copy-
 [`.vscode/mcp.json`](examples/vscode-mcp.json) template, and a project steering file
 ([`examples/copilot-instructions.md`](examples/copilot-instructions.md)).
 
-CI (`.github/workflows/ak-mcp.yml`) runs build + drift + tests + typecheck on every change, and deploys from `main` when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are set.
+CI (`.github/workflows/ak-mcp.yml`) checks out **both** this repo and the firmware repo
+(`FIRMWARE_REPO`, default `the-ak-foundation/ak-base-kit-stm32l151`, exposed to the build as
+`AK_FIRMWARE_DIR`), then runs build + drift + tests + typecheck on every change, and deploys
+from `main` when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are set. If the
+firmware repo is private, uncomment the `token:` line and add a `FIRMWARE_REPO_TOKEN` secret.
+To auto-rebuild when kernel headers change, have the firmware repo send a `repository_dispatch`
+(`event_type: firmware-updated`) to this repo.
 
 ## Adding documentation
 

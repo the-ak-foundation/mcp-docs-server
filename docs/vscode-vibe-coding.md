@@ -110,7 +110,7 @@ Giả sử bạn bắt đầu một firmware AK mới (clone/copy từ base kit 
 4. **Bật Agent mode**, tick các tool `ak-docs`.
 5. **Ra prompt** (xem mục 4). Quan sát agent gọi tool (VS Code hiện "Running tool: get_ak_guide…") rồi mới sinh code.
 6. **Duyệt diff**: kiểm tra agent chỉ sửa trong `application/sources/app/` (và `driver/`), không đụng `ak/`, `boot/`, `networks/`, `common/`.
-7. **Build kiểm chứng**: `cd application && make` (xem [CLAUDE.md](../../CLAUDE.md) ở gốc repo về toolchain — cần shell Unix/WSL).
+7. **Build kiểm chứng**: `cd application && make` (xem `CLAUDE.md` ở gốc repo firmware [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151) về toolchain — cần shell Unix/WSL).
 
 ---
 

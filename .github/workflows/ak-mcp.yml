@@ -1,29 +1,38 @@
 name: ak-mcp
 
 # Build, verify, and deploy the AK MCP documentation server.
-# Scoped to mcp-docs-server/** (and the kernel headers it extracts from) so it
-# never runs for firmware-only changes.
+#
+# This repo derives its API docs from the AK firmware headers, which live in a
+# SEPARATE repo (ak-base-kit-stm32l151). Every job therefore checks out the
+# firmware repo too and points the extractor at it via AK_FIRMWARE_DIR.
 on:
   push:
     branches: [main]
-    paths:
-      - "mcp-docs-server/**"
-      - "application/sources/ak/inc/**"
-      - ".github/workflows/ak-mcp.yml"
   pull_request:
-    paths:
-      - "mcp-docs-server/**"
-      - "application/sources/ak/inc/**"
+  workflow_dispatch:
+  # Optional: let the firmware repo trigger a rebuild when kernel headers change.
+  # In the firmware repo, add a workflow that sends a repository_dispatch with
+  # event_type "firmware-updated" to this repo (needs a PAT with repo scope).
+  repository_dispatch:
+    types: [firmware-updated]
 
-defaults:
-  run:
-    working-directory: mcp-docs-server
+env:
+  # Adjust if your firmware repo slug differs.
+  FIRMWARE_REPO: the-ak-foundation/ak-base-kit-stm32l151
+  AK_FIRMWARE_DIR: ${{ github.workspace }}/firmware
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout ak-mcp
+        uses: actions/checkout@v4
+      - name: Checkout firmware (for kernel headers)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.FIRMWARE_REPO }}
+          path: firmware
+          # token: ${{ secrets.FIRMWARE_REPO_TOKEN }}  # uncomment if firmware repo is private
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -38,10 +47,17 @@ jobs:
 
   deploy:
     needs: verify
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout ak-mcp
+        uses: actions/checkout@v4
+      - name: Checkout firmware (for kernel headers)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.FIRMWARE_REPO }}
+          path: firmware
+          # token: ${{ secrets.FIRMWARE_REPO_TOKEN }}  # uncomment if firmware repo is private
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -53,4 +69,3 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: mcp-docs-server
