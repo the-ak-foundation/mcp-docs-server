@@ -2,7 +2,8 @@
 Copy this file to .github/copilot-instructions.md in your AK firmware project.
 It "steers" the AI agent to always consult the AK MCP docs server before writing
 firmware, so generated code follows kernel conventions and stays out of the core.
-(Cursor: copy the same text into .cursor/rules/ak.md. Claude Code: into CLAUDE.md.)
+(Cursor: copy the same text into .cursor/rules/ak.md. Claude Code: into CLAUDE.md.
+Codex: into AGENTS.md.)
 -->
 
 # AK firmware — agent instructions

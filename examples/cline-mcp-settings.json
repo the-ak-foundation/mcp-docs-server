@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ak-docs": {
+      "type": "streamableHttp",
+      "url": "https://ak-mcp.<your-account>.workers.dev/mcp",
+      "disabled": false,
+      "autoApprove": [
+        "search_ak_docs",
+        "get_ak_api",
+        "list_ak_api",
+        "get_ak_guide",
+        "get_ak_guardrails"
+      ]
+    }
+  }
+}

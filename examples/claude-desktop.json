@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ak-docs": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://ak-mcp.<your-account>.workers.dev/mcp"]
+    }
+  }
+}

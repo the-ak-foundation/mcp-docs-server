@@ -1,0 +1,14 @@
+# Codex — add to ~/.codex/config.toml (the Codex CLI and the Codex IDE extension
+# both read this file). Replace <your-account> with your workers.dev subdomain.
+#
+# Reliable on every Codex build that supports MCP: bridge the remote server over
+# stdio with mcp-remote (requires Node/npx on PATH).
+[mcp_servers.ak-docs]
+command = "npx"
+args = ["-y", "mcp-remote", "https://ak-mcp.<your-account>.workers.dev/mcp"]
+
+# Recent Codex versions speak Streamable HTTP natively. If yours does, delete the
+# block above and use this instead:
+#
+# [mcp_servers.ak-docs]
+# url = "https://ak-mcp.<your-account>.workers.dev/mcp"
