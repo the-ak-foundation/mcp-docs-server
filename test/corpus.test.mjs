@@ -17,7 +17,14 @@ test("ships the core concepts, guides, and guardrails", () => {
   for (const id of ["overview", "scheduler", "messages", "timers", "state-machines"]) {
     assert.ok(corpus.sections.concept.includes(id), `concept ${id} missing`);
   }
-  for (const id of ["create-task", "create-driver", "create-screen", "use-timer", "isr-bridge"]) {
+  for (const id of [
+    "create-task",
+    "create-driver",
+    "create-screen",
+    "use-timer",
+    "isr-bridge",
+    "start-project",
+  ]) {
     assert.ok(corpus.sections.guide.includes(id), `guide ${id} missing`);
   }
   for (const id of ["do-not-modify", "constraints"]) {

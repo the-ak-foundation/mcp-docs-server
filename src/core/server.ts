@@ -15,8 +15,115 @@ import {
 export const SERVER_NAME = "ak-mcp";
 export const SERVER_VERSION = "0.1.0";
 
+/** Firmware repo the base kit is scaffolded from, and the pinned fallback tag. */
+export const AK_FIRMWARE_REPO = "the-ak-foundation/ak-base-kit-stm32l151";
+export const AK_DEFAULT_TAG = "v1.3";
+
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s }] });
 const errorText = (s: string) => ({ content: [{ type: "text" as const, text: s }], isError: true });
+
+interface Release {
+  tag: string;
+  tarball: string;
+  zipball: string;
+  origin: "latest" | "requested" | "pinned";
+}
+
+function archiveUrls(tag: string): { tarball: string; zipball: string } {
+  return {
+    tarball: `https://github.com/${AK_FIRMWARE_REPO}/archive/refs/tags/${tag}.tar.gz`,
+    zipball: `https://github.com/${AK_FIRMWARE_REPO}/archive/refs/tags/${tag}.zip`,
+  };
+}
+
+/**
+ * Resolve which base-kit release to scaffold from. An explicit `ref` wins; else
+ * query the GitHub "latest release" API (best-effort, 4s timeout), falling back
+ * to the pinned AK_DEFAULT_TAG on any error / rate-limit.
+ */
+async function resolveRelease(ref?: string): Promise<Release> {
+  if (ref && ref.trim()) {
+    const tag = ref.trim();
+    return { tag, ...archiveUrls(tag), origin: "requested" };
+  }
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(`https://api.github.com/repos/${AK_FIRMWARE_REPO}/releases/latest`, {
+      headers: { "User-Agent": SERVER_NAME, Accept: "application/vnd.github+json" },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (res.ok) {
+      const data = (await res.json()) as { tag_name?: string };
+      if (data.tag_name) return { tag: data.tag_name, ...archiveUrls(data.tag_name), origin: "latest" };
+    }
+  } catch {
+    /* network/rate-limit — fall back to the pinned tag */
+  }
+  return { tag: AK_DEFAULT_TAG, ...archiveUrls(AK_DEFAULT_TAG), origin: "pinned" };
+}
+
+/** Render the "download + lay out + customize" plan for a new project. */
+function formatBootstrap(projectName: string, rel: Release): string {
+  const name =
+    projectName.replace(/[^A-Za-z0-9._-]/g, "-").replace(/^[-._]+|[-._]+$/g, "") || "my-ak-app";
+  const extracted = `ak-base-kit-stm32l151-${rel.tag.replace(/^v/, "")}`;
+  const note =
+    rel.origin === "latest"
+      ? `latest release (${rel.tag})`
+      : rel.origin === "requested"
+        ? `requested release (${rel.tag})`
+        : `pinned fallback (${rel.tag}) — could not reach the GitHub API for the latest`;
+  return [
+    `# Bootstrap AK project "${name}"`,
+    ``,
+    `Using **${note}** of \`${AK_FIRMWARE_REPO}\`.`,
+    ``,
+    `## 1. Download & extract the base kit`,
+    ``,
+    `**bash / macOS / Linux / WSL / Git Bash:**`,
+    "```sh",
+    `curl -L ${rel.tarball} -o ak.tar.gz`,
+    `tar -xzf ak.tar.gz`,
+    `mv ${extracted} ${name}`,
+    `rm ak.tar.gz`,
+    "```",
+    ``,
+    `**Windows PowerShell:**`,
+    "```powershell",
+    `Invoke-WebRequest ${rel.tarball} -OutFile ak.tar.gz`,
+    `tar -xzf ak.tar.gz`,
+    `Rename-Item ${extracted} ${name}`,
+    `Remove-Item ak.tar.gz`,
+    "```",
+    ``,
+    `**Or track git history instead of a snapshot:**`,
+    "```sh",
+    `git clone --depth 1 --branch ${rel.tag} https://github.com/${AK_FIRMWARE_REPO}.git ${name}`,
+    "```",
+    ``,
+    `## 2. Get oriented`,
+    ``,
+    `- \`${name}/application/\` — the firmware you build (\`sources/app/\` = tasks & screens, \`sources/driver/\` = drivers). **Work here.**`,
+    `- \`${name}/boot/\` — bootloader (separate image). Leave alone.`,
+    `- Kernel \`application/sources/ak/\`, \`networks/\`, \`common/\` are framework — do not modify.`,
+    `- Build needs a Unix-like shell + arm-none-eabi-gcc; see the repo's \`CLAUDE.md\`. Build with \`cd ${name}/application && make\`.`,
+    ``,
+    `## 3. Keep this MCP wired for customization`,
+    ``,
+    `Add a steering file so I keep following AK conventions (see the ak-docs \`examples/copilot-instructions.md\`), then:`,
+    ``,
+    `## 4. Customize for the engineer's needs`,
+    ``,
+    `1. Call **\`get_ak_guardrails\`** — only edit \`application/sources/app/\` and \`application/sources/driver/\`.`,
+    `2. For each feature, call **\`get_ak_guide\`** (\`create-task\`, \`create-driver\`, \`create-screen\`, …) and follow it exactly.`,
+    `3. Use **\`get_ak_api\`** for exact signatures/arguments; **\`search_ak_docs\`** when unsure of a name.`,
+    `4. Rebuild with \`make\` and check \`make info\` for the 16 KB RAM budget.`,
+    ``,
+    `_Tip: prefer a specific tag for reproducible builds — call this tool again with \`ref: "${rel.tag}"\`._`,
+  ].join("\n");
+}
 
 /** Build a fully configured MCP server over a loaded corpus (transport-agnostic). */
 export function createAkServer(corpus: Corpus): McpServer {
@@ -25,6 +132,9 @@ export function createAkServer(corpus: Corpus): McpServer {
     {
       instructions:
         "Documentation for the AK (Active Kernel) event-driven MCU framework. " +
+        "To START A NEW PROJECT from the base kit, call `start_ak_project` — it resolves the " +
+        "latest ak-base-kit-stm32l151 release and returns the exact download/extract commands, " +
+        "then customize the extracted source. " +
         "Use `search_ak_docs` to find anything, `get_ak_api` for exact function/macro " +
         "signatures and arguments, `get_ak_guide` for create-task/create-driver/create-screen " +
         "recipes, and ALWAYS consult `get_ak_guardrails` before generating code — never modify " +
@@ -175,6 +285,32 @@ export function createAkServer(corpus: Corpus): McpServer {
     async () => text(formatGuardrails(corpus))
   );
 
+  server.registerTool(
+    "start_ak_project",
+    {
+      title: "Start a new AK project",
+      description:
+        "Begin a new firmware project from the AK base kit. Resolves the LATEST " +
+        "ak-base-kit-stm32l151 release (or a given tag) and returns the exact commands to " +
+        "download, extract, and lay out the project, plus the steps to customize it. Call this " +
+        "when an engineer wants to start/create/bootstrap a new AK-based project.",
+      inputSchema: {
+        project_name: z
+          .string()
+          .optional()
+          .describe("Folder name for the new project (default 'my-ak-app')."),
+        ref: z
+          .string()
+          .optional()
+          .describe("Specific release tag, e.g. 'v1.3'. Omit to use the latest release."),
+      },
+    },
+    async ({ project_name, ref }) => {
+      const rel = await resolveRelease(ref);
+      return text(formatBootstrap(project_name ?? "my-ak-app", rel));
+    }
+  );
+
   // --- Prompts --------------------------------------------------------------
   server.registerPrompt(
     "ak-new-task",
@@ -228,6 +364,46 @@ export function createAkServer(corpus: Corpus): McpServer {
               `injected via <name>_init(...). Register the module in driver/Makefile.mk, hook any ` +
               `periodic work into sys_irq_timer_10ms(), and have callbacks only task_post_* into a ` +
               `task. Do not modify the kernel, boot, networks, or common. Output the diffs.`,
+          },
+        },
+      ],
+    })
+  );
+
+  server.registerPrompt(
+    "ak-new-project",
+    {
+      title: "Start a new AK project from the base kit",
+      description:
+        "Download the latest ak-base-kit-stm32l151 release and customize it for the engineer.",
+      argsSchema: {
+        description: z.string().describe("What the new firmware should do."),
+        project_name: z.string().optional().describe("Folder name (default 'my-ak-app')."),
+        ref: z.string().optional().describe("Release tag to pin (default: latest)."),
+      },
+    },
+    async ({ description, project_name, ref }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text:
+              `Bootstrap a new AK firmware project` +
+              (project_name ? ` named "${project_name}"` : "") +
+              ` for: ${description}\n\n` +
+              `Steps:\n` +
+              `1) Call \`start_ak_project\`` +
+              (project_name || ref
+                ? ` with { ${[project_name && `project_name: "${project_name}"`, ref && `ref: "${ref}"`]
+                    .filter(Boolean)
+                    .join(", ")} }`
+                : "") +
+              ` to resolve the latest base kit and get the download commands.\n` +
+              `2) Run those commands to download and extract the source into the project folder.\n` +
+              `3) Call \`get_ak_guardrails\` — only edit application/sources/app/ and .../driver/.\n` +
+              `4) Implement the feature above using \`get_ak_guide\` / \`get_ak_api\`, then build with make.\n` +
+              `Output the commands you run and the resulting diffs.`,
           },
         },
       ],

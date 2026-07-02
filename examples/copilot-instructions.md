@@ -13,6 +13,10 @@ This project is firmware for the **AK (Active Kernel)** event-driven MCU framewo
 You have access to the **`ak-docs` MCP server**. Use it as the source of truth — do
 not guess AK APIs from memory.
 
+**Starting a new project?** If this is a fresh/empty workspace (no `application/` yet),
+call **`start_ak_project`** first — it downloads the latest base-kit release and gives you
+the commands to lay it out. Run them, then customize per the steps below.
+
 Before writing or changing any firmware:
 
 1. Call **`get_ak_guardrails`** first. Never modify `application/sources/ak/` (kernel),

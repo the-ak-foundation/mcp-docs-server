@@ -29,13 +29,17 @@ Signatures come from the kernel headers; semantics/examples are layered on per s
 **Tools**
 | Tool | Purpose |
 | --- | --- |
+| `start_ak_project(project_name?, ref?)` | resolve the **latest** base-kit release and return download/extract commands + a customization plan |
 | `search_ak_docs(query, section?, limit?)` | BM25 search across everything |
 | `get_ak_api(symbol)` | exact signature, params, returns, semantics, examples, FATAL codes |
 | `list_ak_api(module?)` | browse the API by module (task/message/timer/fsm/tsm/ak/port) |
-| `get_ak_guide(topic)` | recipes: create-task, create-driver, create-screen, use-timer, isr-bridge, tune-pools |
+| `get_ak_guide(topic)` | recipes: start-project, create-task, create-driver, create-screen, use-timer, isr-bridge, tune-pools |
 | `get_ak_guardrails()` | do-not-modify zones + kernel invariants |
 
-**Prompts:** `ak-new-task`, `ak-new-driver` — guided scaffolding that enforces conventions and guardrails.
+**Prompts:** `ak-new-project`, `ak-new-task`, `ak-new-driver` — guided scaffolding that enforces conventions and guardrails.
+
+`start_ak_project` queries the GitHub "latest release" API at call time (falling back to the
+pinned `v1.3` if the API is unreachable), so new projects always start from the newest tag.
 
 **Resources:** `ak://index`, and `ak://{section}/{id}` for every concept, guide, guardrail, and API entry.
 
