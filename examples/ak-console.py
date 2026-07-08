@@ -5,7 +5,7 @@ Built for AI agents (and humans) to capture logs and drive the AK shell in one
 shot, with bounded timeouts and clean output: everything the BOARD prints goes
 to stdout; everything THIS SCRIPT says goes to stderr.
 
-Requires:  pip install pyserial
+Requires:  sudo apt install python3-serial
 
 Examples:
   python ak-console.py --list
