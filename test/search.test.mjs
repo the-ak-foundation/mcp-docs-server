@@ -49,6 +49,11 @@ test("one-shot timer query surfaces timer docs", () => {
   );
 });
 
+test("debugging over uart finds the debug guide", () => {
+  const ids = search("debug uart shell log").slice(0, 5).map((r) => r.doc.id);
+  assert.ok(ids.includes("debug-uart-shell"), `got: ${ids.join(", ")}`);
+});
+
 test("starting a new project finds the start-project guide", () => {
   const ids = search("start a new project download base kit").slice(0, 5).map((r) => r.doc.id);
   assert.ok(ids.includes("start-project"), `got: ${ids.join(", ")}`);

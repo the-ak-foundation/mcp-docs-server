@@ -28,6 +28,13 @@ Before writing or changing any firmware:
 3. For any kernel function/macro, call **`get_ak_api`** to get the exact signature and
    arguments. Use **`search_ak_docs`** when you don't know the symbol name.
 
+**Debugging a running board?** All debugging is over the UART console (115200 8N1):
+call **`get_ak_guide("debug-uart-shell")`** first. Capture output non-interactively with
+`python ak-console.py --port <P> --cmd "ver" --cmd "fatal l"` (or `--watch 15` for live
+logs), then paste the raw text into **`analyze_ak_log`** and follow its Next steps.
+Run only read-only shell commands on your own; destructive ones (`reboot`, `fatal t/!/@/r`,
+`ram r`, `eps r`, `flash i`, `boot r/t`, `fwu`, `dbg s`) need the engineer's explicit OK.
+
 Hard rules (also returned by `get_ak_guardrails`):
 
 - Handlers must be **non-blocking** — no `delay()`, no busy-wait. Use a timer that posts a

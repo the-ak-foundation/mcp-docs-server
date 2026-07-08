@@ -14,7 +14,14 @@ test("generated/corpus.json exists", () => {
 const corpus = JSON.parse(readFileSync(CORPUS_PATH, "utf8"));
 
 test("ships the core concepts, guides, and guardrails", () => {
-  for (const id of ["overview", "scheduler", "messages", "timers", "state-machines"]) {
+  for (const id of [
+    "overview",
+    "scheduler",
+    "messages",
+    "timers",
+    "state-machines",
+    "debug-infrastructure",
+  ]) {
     assert.ok(corpus.sections.concept.includes(id), `concept ${id} missing`);
   }
   for (const id of [
@@ -24,6 +31,7 @@ test("ships the core concepts, guides, and guardrails", () => {
     "use-timer",
     "isr-bridge",
     "start-project",
+    "debug-uart-shell",
   ]) {
     assert.ok(corpus.sections.guide.includes(id), `guide ${id} missing`);
   }

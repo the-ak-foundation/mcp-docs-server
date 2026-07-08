@@ -18,7 +18,7 @@
     "drift": "node scripts/build-corpus.mjs --check",
     "build": "npm run build:corpus && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test",
+    "test": "node --experimental-strip-types --test",
     "dev": "wrangler dev",
     "deploy": "npm run build:corpus && wrangler deploy",
     "start:stdio": "node dist/cli/bin.js"
@@ -35,6 +35,6 @@
     "wrangler": "^4.0.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.6"
   }
 }

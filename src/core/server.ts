@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { ApiDoc, Corpus, Doc } from "./types.js";
 import { KERNEL_MODULES } from "./types.js";
 import { search } from "./search.js";
+import { analyzeLog } from "./analyze.js";
 import {
   formatApi,
   formatApiList,
@@ -135,6 +136,8 @@ export function createAkServer(corpus: Corpus): McpServer {
         "To START A NEW PROJECT from the base kit, call `start_ak_project` — it resolves the " +
         "latest ak-base-kit-stm32l151 release and returns the exact download/extract commands, " +
         "then customize the extracted source. " +
+        "To DEBUG a running board, call `get_ak_guide(\"debug-uart-shell\")` for the UART/shell " +
+        "playbook and paste any captured console output into `analyze_ak_log` for diagnosis. " +
         "Use `search_ak_docs` to find anything, `get_ak_api` for exact function/macro " +
         "signatures and arguments, `get_ak_guide` for create-task/create-driver/create-screen " +
         "recipes, and ALWAYS consult `get_ak_guardrails` before generating code — never modify " +
@@ -311,6 +314,29 @@ export function createAkServer(corpus: Corpus): McpServer {
     }
   );
 
+  server.registerTool(
+    "analyze_ak_log",
+    {
+      title: "Analyze AK UART log",
+      description:
+        "Paste raw UART console output from an AK board (boot logs, -SIG-> traces, FATAL " +
+        "banners, `fatal l`/`fatal m` dumps, timing lines) and get a structured diagnosis: " +
+        "detected FATAL codes with cause and fix, run-to-completion/starvation timing issues, " +
+        "reboot-loop detection, and the exact shell commands to run next.",
+      inputSchema: {
+        log: z.string().min(1).describe("Raw text captured from the 115200 UART console."),
+        context: z
+          .string()
+          .optional()
+          .describe("Optional: what the engineer observed (symptom, when it happens)."),
+      },
+    },
+    async ({ log, context }) => {
+      const report = analyzeLog(log, corpus);
+      return text(context ? `> Context: ${context}\n\n${report}` : report);
+    }
+  );
+
   // --- Prompts --------------------------------------------------------------
   server.registerPrompt(
     "ak-new-task",
@@ -404,6 +430,41 @@ export function createAkServer(corpus: Corpus): McpServer {
               `3) Call \`get_ak_guardrails\` — only edit application/sources/app/ and .../driver/.\n` +
               `4) Implement the feature above using \`get_ak_guide\` / \`get_ak_api\`, then build with make.\n` +
               `Output the commands you run and the resulting diffs.`,
+          },
+        },
+      ],
+    })
+  );
+
+  server.registerPrompt(
+    "ak-debug",
+    {
+      title: "Debug an AK board over UART/shell",
+      description:
+        "Guided debugging: capture the UART console, drive the shell, and diagnose with analyze_ak_log.",
+      argsSchema: {
+        symptom: z.string().describe("What is going wrong (e.g. 'board resets every ~30 s')."),
+        port: z.string().optional().describe("Serial port, e.g. COM3 or /dev/ttyUSB0."),
+      },
+    },
+    async ({ symptom, port }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text:
+              `Debug this AK board over the UART console. Symptom: ${symptom}\n` +
+              (port ? `Serial port: ${port}\n` : "") +
+              `\nSteps:\n` +
+              `1) Call \`get_ak_guide("debug-uart-shell")\` for the connection commands, the full shell reference, and the symptom playbook.\n` +
+              `2) Capture data with the non-interactive helper (115200 8N1):\n` +
+              `   - live trace: python ak-console.py --port ${port ?? "<PORT>"} --watch 15\n` +
+              `   - health + crash history: python ak-console.py --port ${port ?? "<PORT>"} --cmd "ver" --cmd "fatal l" --cmd "fatal m"\n` +
+              `3) Paste ALL captured text into \`analyze_ak_log\` (include the symptom as context) and follow its Next steps.\n` +
+              `4) Only run read-only shell commands on your own; ask before anything destructive ` +
+              `(reboot, fatal t/!/@/r, ram r, eps r, flash i, boot r/t, fwu, dbg s).\n` +
+              `5) When you fix code, follow \`get_ak_guardrails\` (edit only app/ and driver/), rebuild with make, and re-verify by repeating step 2.`,
           },
         },
       ],

@@ -14,6 +14,7 @@ Ready-to-copy configs for connecting AI coding tools to the deployed **ak-docs**
 | [`codex-config.toml`](codex-config.toml) | OpenAI Codex (CLI + IDE extension) | merge into `~/.codex/config.toml` |
 | [`cline-mcp-settings.json`](cline-mcp-settings.json) | Cline (VS Code extension) | `cline_mcp_settings.json` (open via Cline's UI) |
 | [`copilot-instructions.md`](copilot-instructions.md) | any agent | project steering file (see below) |
+| [`ak-console.py`](ak-console.py) | any agent (serial bridge) | anywhere on PATH-reachable disk; run with `python ak-console.py --port COM3 --cmd "ver"` (needs `pip install pyserial`) |
 
 All configs point at the **remote** deployed Worker (Streamable HTTP). For a local/offline
 stdio server instead, see [`../docs/vscode-vibe-coding.md`](../docs/vscode-vibe-coding.md).

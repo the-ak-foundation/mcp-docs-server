@@ -35,7 +35,7 @@ jobs:
           # token: ${{ secrets.FIRMWARE_REPO_TOKEN }}  # uncomment if firmware repo is private
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Build corpus + drift check
@@ -60,7 +60,7 @@ jobs:
           # token: ${{ secrets.FIRMWARE_REPO_TOKEN }}  # uncomment if firmware repo is private
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm install --no-audit --no-fund
       - name: Build corpus (bundled into the Worker)
         run: npm run build:corpus
