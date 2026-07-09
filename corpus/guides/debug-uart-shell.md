@@ -49,7 +49,7 @@ Syntax is `<cmd> <option> [args]` — one word, one option letter, then optional
 | `ram c` | CPU core registers (IPSR/PRIMASK/FAULTMASK/BASEPRI/CONTROL) |
 | `flash d\|h <start> <stop>` | external SPI flash dump dec/hex |
 | `eps d\|h` | EEPROM dump dec/hex |
-| `lcd d` | **OLED framebuffer dump** (128×64, 1024 bytes hex CSV) — see what's on screen headlessly |
+| `lcd d` | **OLED framebuffer dump** (128×64, 1024 bytes hex CSV) — paste into the **`decode_ak_lcd`** tool to render the screen as text art + PNG |
 | `boot i` | boot-share region: current/update firmware headers + boot commands |
 | `dbg v` / `dbg t` | VBAT voltage / MCU temperature |
 | `modbus r` | poll all Modbus registers (if `TASK_MBMASTER_EN`) |
@@ -81,7 +81,7 @@ Syntax is `<cmd> <option> [args]` — one word, one option letter, then optional
 | **Board seems hung** | is the life LED blinking fast? → **fatal mode**: send single keys `f`, `m`, `e` (`ak-console.py --key f`) | LED fast-blink = FATAL handler; no LED + no shell = hard hang → power-cycle and watch boot |
 | **Sluggish / missed events** | enable `AK_TASK_LOG_CONSOLE_ENABLE` in `ak.cfg.mk`, rebuild, capture | `exeTime` > ~50 ms breaks run-to-completion — split the handler; big `waitTime` → raise the task's priority or shorten higher-priority handlers |
 | **Suspected RAM pressure** | `ver` (heap/stack avail) + `ram s` | heap avail shrinking over time = leak (dynamic messages not freed?) |
-| **Screen shows wrong content** | `lcd d` | decode 1024 bytes → 128×64 bitmap (page-major, 1 bit/pixel) to see the actual framebuffer |
+| **Screen shows wrong content** | `lcd d`, paste the dump into **`decode_ak_lcd`** | the tool renders the actual framebuffer (page-major, LSB = top pixel) as text art + PNG and reports blank/bounding-box stats — compare against what the screen *should* show |
 | **Silent console** | check `-D*_EN` flags in `application/Makefile` `CONSOLE_OPTION`; wrong baud; TX/RX swapped | log macros compile to nothing when their gate is off |
 | **Pool exhaustion recurring** | print `get_*_msg_pool_used_max()` from a debug task, or crash-analyze | resize in `ak.cfg.mk` — see [tune-pools](ak://guide/tune-pools) |
 
@@ -121,6 +121,7 @@ and printing inside a handler adds to its `exeTime`.
 ```
 capture:  python ak-console.py --port <P> --watch 10          (boot/log trace)
 inspect:  python ak-console.py --port <P> --cmd "ver" --cmd "fatal l" --cmd "fatal m"
+screen:   python ak-console.py --port <P> --cmd "lcd d"       → paste into decode_ak_lcd
 analyze:  paste ALL captured text into analyze_ak_log
 fix:      follow its Next steps; edit only app/ & driver/ per guardrails; rebuild; re-verify
 ```

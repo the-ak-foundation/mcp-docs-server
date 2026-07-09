@@ -5,6 +5,13 @@ import { KERNEL_MODULES } from "./types.js";
 import { search } from "./search.js";
 import { analyzeLog } from "./analyze.js";
 import {
+  parseLcdDump,
+  renderLcdAscii,
+  describeLcd,
+  encodeLcdPng,
+  toBase64,
+} from "./lcd.js";
+import {
   formatApi,
   formatApiList,
   formatContent,
@@ -337,6 +344,56 @@ export function createAkServer(corpus: Corpus): McpServer {
     }
   );
 
+  server.registerTool(
+    "decode_ak_lcd",
+    {
+      title: "Decode AK OLED framebuffer",
+      description:
+        "See the board's OLED screen headlessly: paste the raw output of the shell command " +
+        "`lcd d` (the 0xNN,0xNN,... framebuffer dump) and get the screen rendered as text art " +
+        "plus a PNG image, with content stats. Format: 128x64 @ 1bpp, page-major, LSB = top " +
+        "pixel (Adafruit_oled_drv).",
+      inputSchema: {
+        dump: z.string().min(1).describe("Raw `lcd d` capture, including the 0xNN,... lines."),
+        scale: z
+          .number()
+          .int()
+          .min(1)
+          .max(8)
+          .optional()
+          .describe("PNG upscale factor (default 4 → 512×256)."),
+        invert: z
+          .boolean()
+          .optional()
+          .describe("Set true if the display is inverted (content drawn dark on light)."),
+      },
+    },
+    async ({ dump, scale, invert }) => {
+      let fb;
+      try {
+        fb = parseLcdDump(dump);
+      } catch (err) {
+        return errorText((err as Error).message);
+      }
+      const art = renderLcdAscii(fb, invert ?? false);
+      const png = encodeLcdPng(fb, scale ?? 4, invert ?? false);
+      const summaryLines = [
+        `OLED ${fb.width}x${fb.height} — ${describeLcd(fb)}`,
+        ...fb.warnings.map((w) => `warning: ${w}`),
+        "",
+        "```",
+        art,
+        "```",
+      ];
+      return {
+        content: [
+          { type: "text" as const, text: summaryLines.join("\n") },
+          { type: "image" as const, data: toBase64(png), mimeType: "image/png" },
+        ],
+      };
+    }
+  );
+
   // --- Prompts --------------------------------------------------------------
   server.registerPrompt(
     "ak-new-task",
@@ -461,6 +518,7 @@ export function createAkServer(corpus: Corpus): McpServer {
               `2) Capture data with the non-interactive helper (115200 8N1):\n` +
               `   - live trace: python ak-console.py --port ${port ?? "<PORT>"} --watch 15\n` +
               `   - health + crash history: python ak-console.py --port ${port ?? "<PORT>"} --cmd "ver" --cmd "fatal l" --cmd "fatal m"\n` +
+              `   - if the symptom involves the display: python ak-console.py --port ${port ?? "<PORT>"} --cmd "lcd d", then paste that dump into \`decode_ak_lcd\` to see the screen.\n` +
               `3) Paste ALL captured text into \`analyze_ak_log\` (include the symptom as context) and follow its Next steps.\n` +
               `4) Only run read-only shell commands on your own; ask before anything destructive ` +
               `(reboot, fatal t/!/@/r, ram r, eps r, flash i, boot r/t, fwu, dbg s).\n` +

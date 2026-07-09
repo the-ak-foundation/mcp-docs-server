@@ -32,6 +32,8 @@ Before writing or changing any firmware:
 call **`get_ak_guide("debug-uart-shell")`** first. Capture output non-interactively with
 `python ak-console.py --port <P> --cmd "ver" --cmd "fatal l"` (or `--watch 15` for live
 logs), then paste the raw text into **`analyze_ak_log`** and follow its Next steps.
+For display issues, capture `--cmd "lcd d"` and paste the dump into **`decode_ak_lcd`**
+to see the OLED contents.
 Run only read-only shell commands on your own; destructive ones (`reboot`, `fatal t/!/@/r`,
 `ram r`, `eps r`, `flash i`, `boot r/t`, `fwu`, `dbg s`) need the engineer's explicit OK.
 
