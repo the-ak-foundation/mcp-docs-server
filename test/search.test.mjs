@@ -49,6 +49,16 @@ test("one-shot timer query surfaces timer docs", () => {
   );
 });
 
+test("enabling kernel timing log finds the kernel-task-log guide", () => {
+  const ids = search("enable kernel task log timing waitTime exeTime").slice(0, 5).map((r) => r.doc.id);
+  assert.ok(ids.includes("kernel-task-log"), `got: ${ids.join(", ")}`);
+});
+
+test("sys directory is covered by the do-not-modify guardrail", () => {
+  const doc = corpus.documents.find((d) => d.id === "do-not-modify");
+  assert.match(doc.body, /application\/sources\/sys\//);
+});
+
 test("debugging over uart finds the debug guide", () => {
   const ids = search("debug uart shell log").slice(0, 5).map((r) => r.doc.id);
   assert.ok(ids.includes("debug-uart-shell"), `got: ${ids.join(", ")}`);

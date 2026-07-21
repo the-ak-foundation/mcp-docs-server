@@ -20,7 +20,8 @@ the commands to lay it out. Run them, then customize per the steps below.
 Before writing or changing any firmware:
 
 1. Call **`get_ak_guardrails`** first. Never modify `application/sources/ak/` (kernel),
-   `boot/`, `application/sources/networks/`, or `application/sources/common/`.
+   `boot/`, `application/sources/sys/`, `application/sources/networks/`, or
+   `application/sources/common/`.
    Build features in `application/sources/app/` and `application/sources/driver/` only.
 2. For a new task/driver/screen, call **`get_ak_guide`** (`create-task`,
    `create-driver`, `create-screen`, `use-timer`, `isr-bridge`, `tune-pools`) and follow

@@ -76,7 +76,7 @@ include sources/driver/relay/Makefile.mk
 
 ## 2. Provide the hardware functions (BSP)
 
-The concrete GPIO lives in the board/IO layer (e.g. `sys_io` / `io_cfg_*`), and the instance + wiring live in app code. Following the `led_life` / `btn_*` pattern in `app_bsp.cpp` and `app.cpp`:
+The concrete pin functions and the instance live in **app code** (`app_bsp.cpp` / `app.cpp`) — *reuse* the existing `sys_io`/`io_cfg_*` functions or the Arduino shim (`pinMode`/`digitalWrite`); **do not edit `sys/`** ([guardrails](ak://guardrail/do-not-modify)). Following the `led_life` / `btn_*` pattern:
 
 ```c
 relay_t relay_fan;

@@ -35,7 +35,9 @@ handler was running.
 
 ### Kernel per-message timing log
 
-Enable `AK_TASK_LOG_CONSOLE_ENABLE` in `application/sources/ak/ak.cfg.mk` and the scheduler
+Flip `LOG_AK_KERNEL_ENABLE = -UAK_TASK_LOG_CONSOLE_ENABLE` to
+`-DAK_TASK_LOG_CONSOLE_ENABLE` in `application/sources/ak/ak.cfg.mk`
+(recipe: [kernel-task-log](ak://guide/kernel-task-log)) and the scheduler
 prints one line per handled message:
 
 ```

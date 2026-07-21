@@ -185,7 +185,7 @@ Cứ mô tả nhu cầu tự nhiên; với steering file ở trên, agent sẽ t
 ## 6. Server này cung cấp gì
 
 - **Tools:** `start_ak_project`, `search_ak_docs`, `get_ak_api`, `list_ak_api`, `get_ak_guide`, `get_ak_guardrails`, `analyze_ak_log`, `decode_ak_lcd`
-- **Guides:** start-project, create-task, create-driver, create-screen, use-timer, isr-bridge, tune-pools, debug-uart-shell
+- **Guides:** start-project, create-task, create-driver, create-screen, use-timer, isr-bridge, tune-pools, debug-uart-shell, kernel-task-log
 - **Prompts:** `ak-new-project`, `ak-new-task`, `ak-new-driver`, `ak-debug` (template scaffolding kèm guardrails)
 - **Serial bridge cho agent:** [`examples/ak-console.py`](../examples/ak-console.py) — gửi lệnh shell/bắt log UART không tương tác (cần `pip install pyserial`)
 - **Resources:** `ak://index`, `ak://{section}/{id}` (concept / guide / guardrail / api)

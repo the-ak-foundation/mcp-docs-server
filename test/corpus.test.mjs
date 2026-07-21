@@ -32,6 +32,7 @@ test("ships the core concepts, guides, and guardrails", () => {
     "isr-bridge",
     "start-project",
     "debug-uart-shell",
+    "kernel-task-log",
   ]) {
     assert.ok(corpus.sections.guide.includes(id), `guide ${id} missing`);
   }

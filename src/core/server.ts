@@ -115,7 +115,7 @@ function formatBootstrap(projectName: string, rel: Release): string {
     ``,
     `- \`${name}/application/\` — the firmware you build (\`sources/app/\` = tasks & screens, \`sources/driver/\` = drivers). **Work here.**`,
     `- \`${name}/boot/\` — bootloader (separate image). Leave alone.`,
-    `- Kernel \`application/sources/ak/\`, \`networks/\`, \`common/\` are framework — do not modify.`,
+    `- Kernel \`application/sources/ak/\`, \`sys/\`, \`networks/\`, \`common/\` are framework — do not modify.`,
     `- Build needs a Unix-like shell + arm-none-eabi-gcc; see the repo's \`CLAUDE.md\`. Build with \`cd ${name}/application && make\`.`,
     ``,
     `## 3. Keep this MCP wired for customization`,
@@ -148,7 +148,7 @@ export function createAkServer(corpus: Corpus): McpServer {
         "Use `search_ak_docs` to find anything, `get_ak_api` for exact function/macro " +
         "signatures and arguments, `get_ak_guide` for create-task/create-driver/create-screen " +
         "recipes, and ALWAYS consult `get_ak_guardrails` before generating code — never modify " +
-        "the kernel (application/sources/ak), boot, networks, or common; build in app/ and driver/.",
+        "the kernel (application/sources/ak), boot, sys, networks, or common; build in app/ and driver/.",
     }
   );
 
@@ -418,7 +418,7 @@ export function createAkServer(corpus: Corpus): McpServer {
               `4) implement task_xxx.cpp as a non-blocking switch(msg->sig);\n` +
               `5) add the source to app/Makefile.mk and trigger it (timer or seed message).\n` +
               `Only modify files under application/sources/app/. Do not touch the kernel, ` +
-              `boot, networks, or common. Output the diffs.`,
+              `boot, sys, networks, or common. Output the diffs.`,
           },
         },
       ],
@@ -446,7 +446,7 @@ export function createAkServer(corpus: Corpus): McpServer {
               `numbers; the real GPIO functions and the instance live in BSP/app code and are ` +
               `injected via <name>_init(...). Register the module in driver/Makefile.mk, hook any ` +
               `periodic work into sys_irq_timer_10ms(), and have callbacks only task_post_* into a ` +
-              `task. Do not modify the kernel, boot, networks, or common. Output the diffs.`,
+              `task. Do not modify the kernel, boot, sys, networks, or common. Output the diffs.`,
           },
         },
       ],
