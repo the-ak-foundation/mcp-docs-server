@@ -41,7 +41,9 @@ Resources: ak://index and ak://{section}/{id}
 Example client config:
   { "mcpServers": { "ak": { "url": "<this-origin>/mcp" } } }
 
-Docs cover ${corpus.documents.length} entries (${corpus.source.symbols} kernel symbols).
+Docs cover ${corpus.documents.length} entries (${corpus.source.symbols} kernel symbols${
+  corpus.source.firmwareTag ? `, firmware ${corpus.source.firmwareTag}` : ""
+}).
 `;
 
 export default {

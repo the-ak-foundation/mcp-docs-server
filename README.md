@@ -1,28 +1,32 @@
 # ak-mcp — AK Active Kernel documentation MCP server
 
-A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework, whose firmware lives in the sibling repo [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151).
+A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework (firmware: [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151)).
 
 It lets an AI assistant:
 
 - understand the AK kernel core (scheduler, message pools, timers, FSM/TSM),
 - look up exact **API signatures and arguments** (extracted straight from the headers, so they never drift),
 - follow the **rules & format** for creating tasks, drivers, and screens,
-- design new tasks/drivers **without touching** the kernel, boot, networks, or common code.
+- design new tasks/drivers **without touching** the kernel, boot, sys, networks, or common code.
 
 ## How it works
 
+This repo is **standalone** — the kernel headers are vendored (committed) under
+`vendor/ak-inc/`, so nothing else needs to be cloned to build it.
+
 ```
-../ak-base-kit-stm32l151/                                (sibling firmware repo)
-  application/sources/ak/inc/*.h ──► scripts/extract.mjs ─┐
-corpus/ (hand-written guides,        scripts/build-corpus ├─► generated/corpus.json
-         guardrails, enrichment) ───────────────────────┘        (docs + BM25 index)
+vendor/ak-inc/*.h  ──────────────► scripts/extract.mjs ─┐   (snapshot of the kernel
+  ▲ refreshed by                                          │    headers; refresh with
+  scripts/fetch-headers.mjs (GitHub)                      ├─►  npm run fetch-headers)
+corpus/ (hand-written guides,        scripts/build-corpus ┘─► generated/corpus.json
+         guardrails, enrichment) ───────────────────────────►      (docs + BM25 index)
                                                                       │
                                           src/core (resources + tools + prompts)
                                           ├── src/worker  →  Cloudflare Worker (remote HTTP)
                                           └── src/cli     →  npx ak-mcp (stdio, local)
 ```
 
-Signatures come from the kernel headers; semantics/examples are layered on per symbol (`corpus/enrichment/`). A CI **drift check** fails if any cross-reference points at a symbol the headers no longer define.
+Signatures come from the vendored kernel headers; semantics/examples are layered on per symbol (`corpus/enrichment/`). A CI **drift check** fails if any cross-reference points at a symbol the headers no longer define.
 
 ## What it exposes
 
@@ -50,31 +54,28 @@ pinned `v1.3` if the API is unreachable), so new projects always start from the 
 
 **Resources:** `ak://index`, and `ak://{section}/{id}` for every concept, guide, guardrail, and API entry.
 
-## Repository layout (important)
+## Kernel headers (vendored)
 
-This repo is **standalone** but its build reads the firmware kernel headers. Clone the
-firmware repo **next to** this one:
+The build reads the AK kernel's public headers, which are **committed** under `vendor/ak-inc/`
+(a snapshot of a firmware release tag — see `vendor/ak-inc/SOURCE.txt`). Cloning this repo is
+enough to build it: **no firmware checkout required.**
 
-```
-<workspace>/
-  ak-base-kit-stm32l151/     # firmware (source of the headers)
-  mcp-docs-server/           # this repo
-```
-
-The header path is auto-resolved in this order (first existing wins):
-
-1. `$AK_INC_DIR` — exact path to `.../application/sources/ak/inc`
-2. `$AK_FIRMWARE_DIR/application/sources/ak/inc` — firmware repo root
-3. `../ak-base-kit-stm32l151/application/sources/ak/inc` — sibling clone (default)
-
-So a side-by-side clone needs no configuration. Otherwise:
+Refresh the snapshot when the kernel changes:
 
 ```sh
-AK_FIRMWARE_DIR=/path/to/ak-base-kit-stm32l151 npm run build:corpus
+npm run fetch-headers            # pinned default tag (v1.3)
+npm run fetch-headers v1.4       # a specific release tag
 ```
 
+then `npm run build:corpus` and commit `vendor/ak-inc/`. Header resolution order (first
+existing wins) — override only if you want to build against a live firmware checkout:
+
+1. `$AK_INC_DIR` — exact path to `.../application/sources/ak/inc`
+2. `$AK_FIRMWARE_DIR/application/sources/ak/inc` — a firmware repo root
+3. `vendor/ak-inc/` — the committed snapshot (default)
+
 Once `generated/corpus.json` is built, the running server (stdio or Worker) needs **nothing**
-from the firmware repo — the corpus is self-contained.
+external — the corpus is self-contained.
 
 ## Develop
 
@@ -129,17 +130,17 @@ for step-by-step setup (Copilot Agent mode, Cursor, Cline, Claude Code), a copy-
 [`.vscode/mcp.json`](examples/vscode-mcp.json) template, and a project steering file
 ([`examples/copilot-instructions.md`](examples/copilot-instructions.md)).
 
-CI (`.github/workflows/ak-mcp.yml`) checks out **both** this repo and the firmware repo
-(`FIRMWARE_REPO`, default `the-ak-foundation/ak-base-kit-stm32l151`, exposed to the build as
-`AK_FIRMWARE_DIR`), then runs build + drift + tests + typecheck on every change, and deploys
-from `main` when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are set. If the
-firmware repo is private, uncomment the `token:` line and add a `FIRMWARE_REPO_TOKEN` secret.
-To auto-rebuild when kernel headers change, have the firmware repo send a `repository_dispatch`
-(`event_type: firmware-updated`) to this repo.
+CI (`.github/workflows/ak-mcp.yml`) builds from the vendored headers (no firmware checkout):
+`verify` runs build + drift + tests + typecheck on every change, and `deploy` ships from `main`
+when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are set. A `refresh-headers` job
+(manual **Run workflow** with an optional `tag`, or a `repository_dispatch` of type
+`firmware-updated` from the firmware repo) re-fetches `vendor/ak-inc/`, verifies it, and commits
+the update if anything changed.
 
 ## Adding documentation
 
-- **A new API got added to the kernel?** Nothing to do for the signature — it's extracted automatically. Add `corpus/enrichment/<symbol>.md` to give it semantics/examples.
+- **The kernel released a new version?** Run `npm run fetch-headers [<tag>]` to refresh `vendor/ak-inc/`, then `npm run build:corpus` and commit the snapshot. New/changed signatures are then extracted automatically.
+- **A new API needs prose?** Add `corpus/enrichment/<symbol>.md` to give it semantics/examples (the signature is already extracted).
 - **A new recipe or concept?** Add a markdown file under `corpus/guides/` or `corpus/concepts/` with frontmatter (`id`, `title`, `tags`, `summary`, optional `apis`).
 - Run `npm run drift` to verify all references resolve.
 

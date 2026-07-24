@@ -1,0 +1,7 @@
+AK kernel headers vendored for the ak-mcp documentation build.
+Do not edit by hand — refresh with: npm run fetch-headers [<tag>]
+
+repo: the-ak-foundation/ak-base-kit-stm32l151
+tag:  v1.3
+path: application/sources/ak/inc/
+fetched: 2026-07-24T02:59:48.424Z

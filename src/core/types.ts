@@ -54,7 +54,7 @@ export interface CorpusIndex {
 export interface Corpus {
   version: number;
   generatedAt: string;
-  source: { incDir: string; symbols: number };
+  source: { incDir: string; symbols: number; firmwareTag?: string | null };
   documents: Doc[];
   modules: Record<string, string[]>;
   sections: { concept: string[]; guide: string[]; guardrail: string[] };

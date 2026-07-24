@@ -13,6 +13,7 @@
     "README.md"
   ],
   "scripts": {
+    "fetch-headers": "node scripts/fetch-headers.mjs",
     "extract": "node scripts/extract.mjs",
     "build:corpus": "node scripts/build-corpus.mjs",
     "drift": "node scripts/build-corpus.mjs --check",

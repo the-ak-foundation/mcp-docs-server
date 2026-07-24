@@ -2,37 +2,30 @@ name: ak-mcp
 
 # Build, verify, and deploy the AK MCP documentation server.
 #
-# This repo derives its API docs from the AK firmware headers, which live in a
-# SEPARATE repo (ak-base-kit-stm32l151). Every job therefore checks out the
-# firmware repo too and points the extractor at it via AK_FIRMWARE_DIR.
+# This repo is STANDALONE: the kernel headers are vendored under vendor/ak-inc/
+# (committed), so no firmware checkout is needed to build or deploy. Refresh the
+# snapshot with the `refresh-headers` job (or `npm run fetch-headers` locally).
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
-  # Optional: let the firmware repo trigger a rebuild when kernel headers change.
-  # In the firmware repo, add a workflow that sends a repository_dispatch with
-  # event_type "firmware-updated" to this repo (needs a PAT with repo scope).
+    inputs:
+      tag:
+        description: "Firmware release tag to vendor (blank = fetch-headers default)"
+        required: false
+        default: ""
+  # Let the firmware repo trigger a header refresh when the kernel changes:
+  # send a repository_dispatch with event_type "firmware-updated".
   repository_dispatch:
     types: [firmware-updated]
 
-env:
-  # Adjust if your firmware repo slug differs.
-  FIRMWARE_REPO: the-ak-foundation/ak-base-kit-stm32l151
-  AK_FIRMWARE_DIR: ${{ github.workspace }}/firmware
-
 jobs:
   verify:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout ak-mcp
-        uses: actions/checkout@v4
-      - name: Checkout firmware (for kernel headers)
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.FIRMWARE_REPO }}
-          path: firmware
-          # token: ${{ secrets.FIRMWARE_REPO_TOKEN }}  # uncomment if firmware repo is private
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -47,17 +40,10 @@ jobs:
 
   deploy:
     needs: verify
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout ak-mcp
-        uses: actions/checkout@v4
-      - name: Checkout firmware (for kernel headers)
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.FIRMWARE_REPO }}
-          path: firmware
-          # token: ${{ secrets.FIRMWARE_REPO_TOKEN }}  # uncomment if firmware repo is private
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -69,3 +55,33 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # Refresh vendor/ak-inc/ from the firmware repo, verify, and commit if changed.
+  refresh-headers:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Fetch vendored headers
+        run: node scripts/fetch-headers.mjs ${{ github.event.inputs.tag }}
+      - name: Verify the new snapshot builds and tests pass
+        run: |
+          npm run drift
+          npm test
+      - name: Commit if the snapshot changed
+        run: |
+          if git diff --quiet vendor/ak-inc; then
+            echo "vendor/ak-inc unchanged — nothing to commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add vendor/ak-inc
+            git commit -m "chore: refresh vendored AK kernel headers"
+            git push
+          fi

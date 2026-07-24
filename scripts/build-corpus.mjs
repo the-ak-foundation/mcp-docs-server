@@ -64,6 +64,14 @@ function readDir(section) {
 // --- 1. API documents (extracted + enriched) -------------------------------
 const incDir = resolveIncDir();
 const extracted = extractAll(incDir);
+// Provenance of the headers (from vendor/ak-inc/SOURCE.txt when vendored).
+let firmwareTag = null;
+try {
+  const src = readFileSync(join(incDir, "SOURCE.txt"), "utf8");
+  firmwareTag = src.match(/^tag:\s*(\S+)/m)?.[1] ?? null;
+} catch {
+  /* not a vendored dir (e.g. AK_FIRMWARE_DIR points at a live checkout) */
+}
 const extractedNames = new Set(extracted.map((e) => e.name));
 const enrichment = new Map();
 for (const { file, meta, body } of readDir("enrichment")) {
@@ -169,7 +177,7 @@ documents.forEach((doc, idx) => {
 const corpus = {
   version: 1,
   generatedAt: new Date().toISOString(),
-  source: { incDir: incDir.replace(/\\/g, "/"), symbols: extracted.length },
+  source: { incDir: incDir.replace(/\\/g, "/"), symbols: extracted.length, firmwareTag },
   documents,
   modules,
   sections,

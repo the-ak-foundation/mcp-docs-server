@@ -17,34 +17,32 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const MCP_ROOT = resolve(SCRIPT_DIR, "..");
 
 const INC_SUBPATH = ["application", "sources", "ak", "inc"];
-const FIRMWARE_DIR_NAME = "ak-base-kit-stm32l151";
+/** Committed snapshot of the kernel headers — refresh with scripts/fetch-headers.mjs. */
+const VENDOR_INC = join(MCP_ROOT, "vendor", "ak-inc");
 
 /**
- * Locate the AK kernel headers. This repo derives API docs from the firmware
- * headers at build time, so the firmware source must be reachable. Resolution
- * order (first existing wins):
- *   1. $AK_INC_DIR                        — exact path to .../ak/inc
- *   2. $AK_FIRMWARE_DIR/application/...    — firmware repo root
- *   3. <parent>/ak-base-kit-stm32l151/…   — firmware repo cloned as a sibling (default)
- *   4. <parent>/application/…             — legacy: this folder living inside the firmware repo
+ * Locate the AK kernel headers. This repo is STANDALONE: by default it reads a
+ * vendored snapshot (vendor/ak-inc/), so no firmware checkout is needed to build.
+ * Resolution order (first existing wins):
+ *   1. $AK_INC_DIR                      — exact path to .../ak/inc
+ *   2. $AK_FIRMWARE_DIR/application/... — point at a live firmware checkout
+ *   3. vendor/ak-inc/                   — the committed snapshot (default)
  */
 export function resolveIncDir() {
   const candidates = [];
   if (process.env.AK_INC_DIR) candidates.push(process.env.AK_INC_DIR);
   if (process.env.AK_FIRMWARE_DIR)
     candidates.push(join(process.env.AK_FIRMWARE_DIR, ...INC_SUBPATH));
-  candidates.push(join(MCP_ROOT, "..", FIRMWARE_DIR_NAME, ...INC_SUBPATH));
-  candidates.push(join(MCP_ROOT, "..", ...INC_SUBPATH));
+  candidates.push(VENDOR_INC);
 
   for (const c of candidates) {
     if (existsSync(c)) return resolve(c);
   }
   throw new Error(
-    "Could not locate the AK kernel headers (application/sources/ak/inc).\n" +
-      "This repo builds its docs from the firmware headers, so the firmware source must be reachable.\n" +
-      "Fix with ONE of:\n" +
-      `  - clone the firmware repo as a sibling folder named "${FIRMWARE_DIR_NAME}", or\n` +
-      "  - set AK_FIRMWARE_DIR=/path/to/ak-base-kit-stm32l151, or\n" +
+    "Could not locate the AK kernel headers.\n" +
+      "The vendored snapshot (vendor/ak-inc/) is missing. Fix with ONE of:\n" +
+      "  - run `npm run fetch-headers` to (re)download the snapshot from GitHub, or\n" +
+      "  - set AK_FIRMWARE_DIR=/path/to/ak-base-kit-stm32l151 (a live firmware checkout), or\n" +
       "  - set AK_INC_DIR=/path/to/application/sources/ak/inc\n" +
       "Tried:\n" +
       candidates.map((c) => `  - ${c}`).join("\n")
