@@ -49,6 +49,11 @@ test("one-shot timer query surfaces timer docs", () => {
   );
 });
 
+test("workflow query finds the agent-workflow guide", () => {
+  const ids = search("commit after each feature verify screen release build").slice(0, 5).map((r) => r.doc.id);
+  assert.ok(ids.includes("agent-workflow"), `got: ${ids.join(", ")}`);
+});
+
 test("enabling kernel timing log finds the kernel-task-log guide", () => {
   const ids = search("enable kernel task log timing waitTime exeTime").slice(0, 5).map((r) => r.doc.id);
   assert.ok(ids.includes("kernel-task-log"), `got: ${ids.join(", ")}`);

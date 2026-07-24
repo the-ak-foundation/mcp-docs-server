@@ -38,6 +38,20 @@ to see the OLED contents.
 Run only read-only shell commands on your own; destructive ones (`reboot`, `fatal t/!/@/r`,
 `ram r`, `eps r`, `flash i`, `boot r/t`, `fwu`, `dbg s`) need the engineer's explicit OK.
 
+Workflow (see `get_ak_guide("agent-workflow")`):
+
+1. **Develop/debug with `-URELEASE`** — keep `RELEASE_OPTION = -URELEASE` in
+   `application/Makefile` (its default). A `-DRELEASE` build auto-resets on FATAL and hides
+   the interactive fatal mode; only build `-DRELEASE` for the shipping artifact.
+2. **Commit after every finished feature** if the folder is a git repo (`git rev-parse
+   --is-inside-work-tree`): one feature = one `git add -A && git commit -m "<what/why>"`.
+   Don't create commits in a non-repo without asking.
+3. **After implementing/changing any screen**, flash + navigate to it, capture `--cmd "lcd d"`,
+   and run **`decode_ak_lcd`** to confirm the framebuffer matches the intended layout.
+4. **After the final build**, exercise every path you touched, then run `--cmd "fatal l"
+   --cmd "fatal m"`; if `fatal_times` rose or a tag appears, feed it to `analyze_ak_log`,
+   fix the root cause, and repeat until a full run leaves `fatal_times` unchanged.
+
 Hard rules (also returned by `get_ak_guardrails`):
 
 - Handlers must be **non-blocking** — no `delay()`, no busy-wait. Use a timer that posts a

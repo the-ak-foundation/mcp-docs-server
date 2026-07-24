@@ -145,6 +145,9 @@ export function createAkServer(corpus: Corpus): McpServer {
         "then customize the extracted source. " +
         "To DEBUG a running board, call `get_ak_guide(\"debug-uart-shell\")` for the UART/shell " +
         "playbook and paste any captured console output into `analyze_ak_log` for diagnosis. " +
+        "Follow `get_ak_guide(\"agent-workflow\")`: develop with -URELEASE, commit each finished " +
+        "feature (if a git repo), verify every new screen with `decode_ak_lcd`, and sweep `fatal l` " +
+        "after the final build. " +
         "Use `search_ak_docs` to find anything, `get_ak_api` for exact function/macro " +
         "signatures and arguments, `get_ak_guide` for create-task/create-driver/create-screen " +
         "recipes, and ALWAYS consult `get_ak_guardrails` before generating code — never modify " +

@@ -71,4 +71,16 @@ void scr_clock_handle(ak_msg_t* msg) {
 - Always cancel your timers on `SCREEN_EXIT` / when leaving.
 - Mind the 16 KB RAM budget if using STL containers in a screen.
 
-See also: [state-machines](ak://concept/state-machines), [use-timer](ak://guide/use-timer).
+## Verify the screen (do not skip)
+
+After building/flashing, navigate to the new screen on the device, dump the framebuffer, and
+check it with the **`decode_ak_lcd`** tool — the compiler can't see a mis-laid-out screen:
+
+```sh
+python ak-console.py --port <PORT> --cmd "lcd d"    # paste output into decode_ak_lcd
+```
+
+Compare the rendered 128×64 image against the intended layout (blank draw? text off-panel?
+inverted? wrong cursor origin?). See [agent-workflow](ak://guide/agent-workflow).
+
+See also: [state-machines](ak://concept/state-machines), [use-timer](ak://guide/use-timer), [debug-uart-shell](ak://guide/debug-uart-shell).

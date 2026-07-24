@@ -33,6 +33,7 @@ test("ships the core concepts, guides, and guardrails", () => {
     "start-project",
     "debug-uart-shell",
     "kernel-task-log",
+    "agent-workflow",
   ]) {
     assert.ok(corpus.sections.guide.includes(id), `guide ${id} missing`);
   }
