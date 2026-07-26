@@ -1,4 +1,4 @@
-# [ak-mcp] - AK Active Kernel documentation MCP server
+# AK Active Kernel documentation MCP server
 
 A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework (firmware: [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151)).
 
