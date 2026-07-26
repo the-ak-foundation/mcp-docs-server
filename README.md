@@ -1,13 +1,13 @@
-# ak-mcp — AK Active Kernel documentation MCP server
+# [ak-mcp] - AK Active Kernel documentation MCP server
 
 A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework (firmware: [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151)).
 
 It lets an AI assistant:
 
-- understand the AK kernel core (scheduler, message pools, timers, FSM/TSM),
-- look up exact **API signatures and arguments** (extracted straight from the headers, so they never drift),
-- follow the **rules & format** for creating tasks, drivers, and screens,
-- design new tasks/drivers **without touching** the kernel, boot, sys, networks, or common code.
+- Understand the AK kernel core (scheduler, message pools, timers, FSM/TSM),
+- Look up exact **API signatures and arguments** (extracted straight from the headers, so they never drift),
+- Follow the **rules & format** for creating tasks, drivers, and screens,
+- Design new tasks/drivers **without touching** the kernel, boot, sys, networks, or common code.
 
 ## How it works
 
