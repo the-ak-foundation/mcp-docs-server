@@ -57,7 +57,7 @@ export function formatSearchResults(query: string, results: SearchResult[]): str
   const lines = [`Found ${results.length} result(s) for "${query}":\n`];
   for (const { doc, score } of results) {
     const summary = "summary" in doc && doc.summary ? doc.summary : firstLine(doc.body);
-    lines.push(`- **${doc.title}** \`[${doc.section}]\` — ${doc.uri}`);
+    lines.push(`- **${doc.title}** \`[${doc.section}]\` - ${doc.uri}`);
     if (summary) lines.push(`  ${summary}`);
   }
   lines.push(
@@ -80,7 +80,7 @@ export function formatApiList(corpus: Corpus, moduleFilter?: string): string {
         | undefined;
       if (!doc) continue;
       const oneLine = doc.summary || doc.signature;
-      lines.push(`- **${name}** \`${doc.kind}\` — ${oneLine}`);
+      lines.push(`- **${name}** \`${doc.kind}\` - ${oneLine}`);
     }
   }
   lines.push("\nUse `get_ak_api(\"<symbol>\")` for the full entry.");

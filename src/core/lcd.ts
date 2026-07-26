@@ -1,9 +1,9 @@
 /**
- * lcd.ts — decode the AK base kit's OLED framebuffer dump (`lcd d` shell command)
+ * lcd.ts - decode the AK base kit's OLED framebuffer dump (`lcd d` shell command)
  * so an agent can "see" the screen headlessly.
  *
  * Framebuffer format (verified against driver/Adafruit_oled_drv/Adafruit_oled_drv.cpp
- * drawPixel): 128×64 @ 1 bpp, PAGE-MAJOR — byte index = (y/8)*WIDTH + x, and the
+ * drawPixel): 128×64 @ 1 bpp, PAGE-MAJOR - byte index = (y/8)*WIDTH + x, and the
  * LSB of each byte is the TOP pixel of its 8-pixel page: bit = (y % 8).
  *
  * IMPORTANT: zero runtime imports (like analyze.ts) so tests can load this file
@@ -49,7 +49,7 @@ export function parseLcdDump(text: string): LcdFrame {
   if (start !== -1 && end !== -1 && end > start) {
     region = text.slice(start, end);
   } else if (start !== -1 || end !== -1) {
-    warnings.push("dump start/end markers incomplete — capture may be truncated");
+    warnings.push("dump start/end markers incomplete - capture may be truncated");
     region = start !== -1 ? text.slice(start) : text;
   }
 
@@ -73,18 +73,18 @@ export function parseLcdDump(text: string): LcdFrame {
   }
   if (declaredBytes !== null && declaredBytes !== bytes.length) {
     warnings.push(
-      `device declared ${declaredBytes} bytes but ${bytes.length} were parsed — capture may be truncated`
+      `device declared ${declaredBytes} bytes but ${bytes.length} were parsed - capture may be truncated`
     );
   }
   if (bytes.length % width !== 0) {
     warnings.push(
-      `${bytes.length} bytes is not a whole number of ${width}-byte pages — trailing partial page ignored`
+      `${bytes.length} bytes is not a whole number of ${width}-byte pages - trailing partial page ignored`
     );
   }
   const pages = Math.floor(bytes.length / width);
   if (pages === 0) {
     throw new Error(
-      `Only ${bytes.length} bytes parsed — not even one ${width}-byte page. Capture is too truncated to render.`
+      `Only ${bytes.length} bytes parsed - not even one ${width}-byte page. Capture is too truncated to render.`
     );
   }
   const height = pages * 8;
@@ -97,7 +97,7 @@ export function parseLcdDump(text: string): LcdFrame {
 
 /**
  * Render as text, two vertical pixels per character (▀ ▄ █ ·), framed.
- * 128×64 → 32 lines of 128 chars — compact enough to paste, dense enough to read.
+ * 128×64 → 32 lines of 128 chars - compact enough to paste, dense enough to read.
  */
 export function renderLcdAscii(fb: LcdFrame, invert = false): string {
   const on = (x: number, y: number) => lcdPixel(fb, x, y) === (invert ? 0 : 1);
@@ -149,7 +149,7 @@ export function lcdStats(fb: LcdFrame): LcdStats {
 }
 
 /* ---------------------------------------------------------------------------
- * Minimal PNG encoder — 1-bit grayscale, uncompressed ("stored") deflate
+ * Minimal PNG encoder - 1-bit grayscale, uncompressed ("stored") deflate
  * blocks inside a valid zlib stream. No dependencies.
  * ------------------------------------------------------------------------- */
 

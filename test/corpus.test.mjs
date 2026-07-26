@@ -8,7 +8,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CORPUS_PATH = join(ROOT, "generated", "corpus.json");
 
 test("generated/corpus.json exists", () => {
-  assert.ok(existsSync(CORPUS_PATH), "missing corpus.json — run `npm run build:corpus`");
+  assert.ok(existsSync(CORPUS_PATH), "missing corpus.json - run `npm run build:corpus`");
 });
 
 const corpus = JSON.parse(readFileSync(CORPUS_PATH, "utf8"));

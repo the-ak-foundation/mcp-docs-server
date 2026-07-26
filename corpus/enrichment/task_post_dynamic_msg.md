@@ -13,9 +13,9 @@ Use only when the payload is larger than 64 B or genuinely variable-length. Pref
 
 ## Parameters
 
-- `task_id_t des_task_id` — destination task.
-- `uint8_t sig` — the signal.
-- `uint8_t* data` — bytes to copy.
-- `uint32_t len` — payload length.
+- `task_id_t des_task_id` - destination task.
+- `uint8_t sig` - the signal.
+- `uint8_t* data` - bytes to copy.
+- `uint32_t len` - payload length.
 
 `FATAL("MF", 0x41)` if the dynamic pool is exhausted; `FATAL("ak_malloc", 0x01)` on heap overflow (the part has only 16 KB RAM).

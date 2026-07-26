@@ -9,7 +9,7 @@ tags: ref-count, fan-out, lifetime
 
 Increments the message's reference count so it survives the automatic free that happens when a handler returns. Pair every increment with a matching `msg_dec_ref_count` (or `msg_free`) when each consumer is done.
 
-Use this to deliver the same message to multiple tasks, or to retain a message beyond the current handler. **Maximum reference count is 7** — exceeding it is `FATAL("MF", 0x61)`.
+Use this to deliver the same message to multiple tasks, or to retain a message beyond the current handler. **Maximum reference count is 7** - exceeding it is `FATAL("MF", 0x61)`.
 
 ## Example
 
@@ -19,4 +19,4 @@ task_post(AC_TASK_A_ID, msg);
 task_post(AC_TASK_B_ID, msg);       // both deliveries share one message
 ```
 
-> Never read or write the `ref_count` byte directly — it also encodes the pool type. Use these helpers and the `get_msg_*` macros.
+> Never read or write the `ref_count` byte directly - it also encodes the pool type. Use these helpers and the `get_msg_*` macros.

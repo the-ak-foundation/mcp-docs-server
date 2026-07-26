@@ -27,7 +27,7 @@ function makeDump(bytes, { noise = true } = {}) {
   ].join("\n");
 }
 
-/** Framebuffer with pixels lit at (0,0), (5,12), (127,63) — page-major, LSB=top. */
+/** Framebuffer with pixels lit at (0,0), (5,12), (127,63) - page-major, LSB=top. */
 function fixtureBytes() {
   const buf = new Uint8Array(1024);
   buf[0 * 128 + 0] |= 1 << 0; // (0,0): page 0, bit 0

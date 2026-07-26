@@ -46,7 +46,7 @@ void relay_off(relay_t* relay);
 ```
 
 ```c
-/* driver/relay/relay.c — pure logic, no pins */
+/* driver/relay/relay.c - pure logic, no pins */
 #include "relay.h"
 void relay_init(relay_t* r, pf_relay_ctrl init, pf_relay_ctrl on, pf_relay_ctrl off) {
     r->pf_init = init; r->pf_on = on; r->pf_off = off;
@@ -76,7 +76,7 @@ include sources/driver/relay/Makefile.mk
 
 ## 2. Provide the hardware functions (BSP)
 
-The concrete pin functions and the instance live in **app code** (`app_bsp.cpp` / `app.cpp`) — *reuse* the existing `sys_io`/`io_cfg_*` functions or the Arduino shim (`pinMode`/`digitalWrite`); **do not edit `sys/`** ([guardrails](ak://guardrail/do-not-modify)). Following the `led_life` / `btn_*` pattern:
+The concrete pin functions and the instance live in **app code** (`app_bsp.cpp` / `app.cpp`) - *reuse* the existing `sys_io`/`io_cfg_*` functions or the Arduino shim (`pinMode`/`digitalWrite`); **do not edit `sys/`** ([guardrails](ak://guardrail/do-not-modify)). Following the `led_life` / `btn_*` pattern:
 
 ```c
 relay_t relay_fan;
@@ -90,7 +90,7 @@ relay_init(&relay_fan, relay_fan_init, relay_fan_on, relay_fan_off);
 
 ## 3. (Input drivers) Poll periodically and bridge events to a task
 
-Input drivers expose a `*_polling()` you call from the 10 ms timer hook `sys_irq_timer_10ms()` (see `app.cpp`), exactly like `button_timer_polling(&btn_mode)`. The driver's **callback** turns a hardware event into an AK message — it must not do heavy work:
+Input drivers expose a `*_polling()` you call from the 10 ms timer hook `sys_irq_timer_10ms()` (see `app.cpp`), exactly like `button_timer_polling(&btn_mode)`. The driver's **callback** turns a hardware event into an AK message - it must not do heavy work:
 
 ```c
 void btn_mode_callback(void* b) {

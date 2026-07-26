@@ -1,5 +1,5 @@
 /**
- * analyze.ts — deterministic analyzer for AK UART console captures.
+ * analyze.ts - deterministic analyzer for AK UART console captures.
  *
  * Given raw text captured from the 115200 console (boot logs, -SIG-> traces,
  * FATAL output, `fatal l` / `fatal m` dumps, kernel timing lines), produce a
@@ -21,7 +21,7 @@ interface FatalKnowledge {
 const FATAL_TABLE: Record<string, FatalKnowledge> = {
   "MF:0x20": {
     cause: "msg_free() saw a message whose pool-type bits are corrupted",
-    fix: "memory corruption — check for buffer overruns writing past a payload, or use of a message after it was freed",
+    fix: "memory corruption - check for buffer overruns writing past a payload, or use of a message after it was freed",
   },
   "MF:0x21": {
     cause: "COMMON message pool exhausted (get_common_msg)",
@@ -37,19 +37,19 @@ const FATAL_TABLE: Record<string, FatalKnowledge> = {
   },
   "MF:0x26": {
     cause: "get_data_common_msg() called on a non-common message",
-    fix: "check msg type before reading payload — handler probably receives mixed message kinds",
+    fix: "check msg type before reading payload - handler probably receives mixed message kinds",
   },
   "MF:0x27": {
     cause: "msg_force_free() saw a corrupted message type",
-    fix: "memory corruption — same investigation as MF:0x20",
+    fix: "memory corruption - same investigation as MF:0x20",
   },
   "MF:0x28": {
     cause: "reference count decremented below zero (double free)",
-    fix: "unbalanced msg_inc_ref_count/msg_dec_ref_count — remove a manual msg_free after task_post",
+    fix: "unbalanced msg_inc_ref_count/msg_dec_ref_count - remove a manual msg_free after task_post",
   },
   "MF:0x31": {
     cause: "PURE message pool exhausted (get_pure_msg)",
-    fix: "raise AK_PURE_MSG_POOL_SIZE in ak.cfg.mk, or find the flood source — a timer or ISR posting faster than a handler drains",
+    fix: "raise AK_PURE_MSG_POOL_SIZE in ak.cfg.mk, or find the flood source - a timer or ISR posting faster than a handler drains",
   },
   "MF:0x38": {
     cause: "get_data_len_common_msg() called on a non-common message",
@@ -69,7 +69,7 @@ const FATAL_TABLE: Record<string, FatalKnowledge> = {
   },
   "MF:0x61": {
     cause: "reference count exceeded the maximum (7)",
-    fix: "too many msg_inc_ref_count on one message — restructure the fan-out",
+    fix: "too many msg_inc_ref_count on one message - restructure the fan-out",
   },
   "MT:0x30": {
     cause: "TIMER pool exhausted (timer_set)",
@@ -81,7 +81,7 @@ const FATAL_TABLE: Record<string, FatalKnowledge> = {
   },
   "TK:0x02": {
     cause: "task_post() to a task ID outside the registered table",
-    fix: "the destination ID isn't in app_task_table — check task_list.h enum vs the table rows (feature flag mismatch is a classic cause)",
+    fix: "the destination ID isn't in app_task_table - check task_list.h enum vs the table rows (feature flag mismatch is a classic cause)",
   },
   "TK:0x05": {
     cause: "task_remove_msg() with an out-of-range task ID",
@@ -100,16 +100,16 @@ const FATAL_TABLE: Record<string, FatalKnowledge> = {
     fix: "bind a real tsm_t* table before dispatching",
   },
   "ak_malloc:0x01": {
-    cause: "heap overflow — allocation would pass __heap_end__",
+    cause: "heap overflow - allocation would pass __heap_end__",
     fix: "dynamic payloads too large for the 16 KB part; shrink payloads or static buffers",
   },
   "ak_malloc:0x02": {
     cause: "malloc() returned NULL",
-    fix: "heap exhausted/fragmented — reduce dynamic message sizes and STL usage",
+    fix: "heap exhausted/fragmented - reduce dynamic message sizes and STL usage",
   },
   "TEST:0x02": {
     cause: "test FATAL triggered by the shell command `fatal t`",
-    fix: "expected if someone ran the test — send `r` to reset",
+    fix: "expected if someone ran the test - send `r` to reset",
   },
 };
 
@@ -130,7 +130,7 @@ const BASE_KIT_TASK_IDS: Record<number, string> = {
 const EXE_WARN_MS = 50;
 const EXE_SEVERE_MS = 500;
 const WAIT_WARN_MS = 200;
-/** fatal-m dumps of an erased flash sector decode to garbage — filter it. */
+/** fatal-m dumps of an erased flash sector decode to garbage - filter it. */
 const INSANE_MS = 100_000_000;
 const INSANE_TASK_ID = 100;
 
@@ -148,15 +148,15 @@ function normTag(tag: string, code: number): string {
 function describeTaskId(id: number): string {
   const name = BASE_KIT_TASK_IDS[id];
   return name
-    ? `${id} (${name} in the stock base kit — verify against this project's app/task_list.h)`
-    : `${id} (project-specific — look it up in app/task_list.h enum order)`;
+    ? `${id} (${name} in the stock base kit - verify against this project's app/task_list.h)`
+    : `${id} (project-specific - look it up in app/task_list.h enum order)`;
 }
 
 function describeSig(sig: number): string {
   if (sig === 254) return `${sig} (SCREEN_ENTRY)`;
   if (sig === 255) return `${sig} (SCREEN_EXIT)`;
   return sig >= 10
-    ? `${sig} (user signal — AK_USER_DEFINE_SIG+${sig - 10}; count from the task's enum in app/app.h)`
+    ? `${sig} (user signal - AK_USER_DEFINE_SIG+${sig - 10}; count from the task's enum in app/app.h)`
     : `${sig} (kernel-reserved signal 0..9)`;
 }
 
@@ -199,7 +199,7 @@ export function analyzeLog(raw: string, corpus: Corpus): string {
       interpretation.push(`- \`${key}\`: ${known.cause}.\n  **Fix:** ${known.fix}.`);
     } else {
       interpretation.push(
-        `- \`${key}\`: not a stock kernel code — search this project's sources for \`FATAL("${key.split(":")[0]}"\`.`
+        `- \`${key}\`: not a stock kernel code - search this project's sources for \`FATAL("${key.split(":")[0]}"\`.`
       );
     }
     // Cross-reference corpus API docs that list this fatal code.
@@ -214,7 +214,7 @@ export function analyzeLog(raw: string, corpus: Corpus): string {
   }
   if (fatalHits.length) {
     steps.push(
-      "If the board is still in fatal mode (life LED blinking fast): send single keys — `f` (fatal info), `m` (message history), `e` (IRQ log). With the helper: `python ak-console.py --port <P> --key f`.",
+      "If the board is still in fatal mode (life LED blinking fast): send single keys - `f` (fatal info), `m` (message history), `e` (IRQ log). With the helper: `python ak-console.py --port <P> --key f`.",
       "After reboot the snapshot persists: run `fatal l` and `fatal m` (safe, read-only).",
       "Cross-check the pool high-water marks and sizes in ak.cfg.mk (guide: tune-pools)."
     );
@@ -229,7 +229,7 @@ export function analyzeLog(raw: string, corpus: Corpus): string {
     findings.push(`Crash counters: **fatal_times=${f}**, **restart_times=${r}**.`);
     if (r > f * 2 && r - f >= 3) {
       interpretation.push(
-        `- Restarts (${r}) far exceed FATALs (${f}) → most resets are **not** FATALs: suspect the **watchdog** (32 s independent / 20 s soft) — a handler or loop blocks too long — or power issues. Check \`fatal m\` for huge exe_time entries.`
+        `- Restarts (${r}) far exceed FATALs (${f}) → most resets are **not** FATALs: suspect the **watchdog** (32 s independent / 20 s soft) - a handler or loop blocks too long - or power issues. Check \`fatal m\` for huge exe_time entries.`
       );
     }
   }
@@ -267,11 +267,11 @@ export function analyzeLog(raw: string, corpus: Corpus): string {
     );
     if (maxExe.exe >= EXE_SEVERE_MS) {
       interpretation.push(
-        `- exe_time ${maxExe.exe} ms on task ${describeTaskId(maxExe.task)} sig ${maxExe.sig} is **severe** — AK is run-to-completion, so this handler froze everything else (and risks the 20 s/32 s watchdogs). Split the work: post follow-up messages or use a timer.`
+        `- exe_time ${maxExe.exe} ms on task ${describeTaskId(maxExe.task)} sig ${maxExe.sig} is **severe** - AK is run-to-completion, so this handler froze everything else (and risks the 20 s/32 s watchdogs). Split the work: post follow-up messages or use a timer.`
       );
     } else if (maxExe.exe >= EXE_WARN_MS) {
       interpretation.push(
-        `- exe_time ${maxExe.exe} ms on task ${describeTaskId(maxExe.task)} sig ${maxExe.sig} exceeds ~${EXE_WARN_MS} ms — long for a run-to-completion handler; consider splitting it.`
+        `- exe_time ${maxExe.exe} ms on task ${describeTaskId(maxExe.task)} sig ${maxExe.sig} exceeds ~${EXE_WARN_MS} ms - long for a run-to-completion handler; consider splitting it.`
       );
     }
     if (maxWait.wait >= WAIT_WARN_MS) {
@@ -294,13 +294,13 @@ export function analyzeLog(raw: string, corpus: Corpus): string {
     );
     if (fatalHits.length || raw.includes("[fatal]")) {
       interpretation.push(
-        `- The last traced signal (\`${last[last.length - 1]}\`) is the last handler that started before the crash — begin reading there.`
+        `- The last traced signal (\`${last[last.length - 1]}\`) is the last handler that started before the crash - begin reading there.`
       );
     }
     const top = [...freq.entries()].sort((a, b) => b[1] - a[1])[0];
     if (top && top[1] >= 10 && top[1] / sigTrace.length > 0.6) {
       interpretation.push(
-        `- \`${top[0]}\` dominates the trace (${top[1]}/${sigTrace.length}) — possible message flood (runaway periodic timer or ISR re-posting).`
+        `- \`${top[0]}\` dominates the trace (${top[1]}/${sigTrace.length}) - possible message flood (runaway periodic timer or ISR re-posting).`
       );
     }
   }
@@ -310,7 +310,7 @@ export function analyzeLog(raw: string, corpus: Corpus): string {
   if (boots >= 2) {
     findings.push(`**${boots} boot banners** ("App run mode:") in one capture → the board restarted ${boots - 1}×.`);
     interpretation.push(
-      `- Repeated restarts: if no FATAL tag appears between banners, suspect the **watchdog** (a blocking handler) or power/brown-out. Run \`fatal l\` — rising fatal_times means FATALs; rising restart_times alone means watchdog/power.`
+      `- Repeated restarts: if no FATAL tag appears between banners, suspect the **watchdog** (a blocking handler) or power/brown-out. Run \`fatal l\` - rising fatal_times means FATALs; rising restart_times alone means watchdog/power.`
     );
     steps.push("Capture longer with `--watch 40` to see whether a FATAL tag prints right before each restart.");
   }

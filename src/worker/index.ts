@@ -1,5 +1,5 @@
 /**
- * Cloudflare Worker transport — public, remote MCP endpoint.
+ * Cloudflare Worker transport - public, remote MCP endpoint.
  *
  *   POST/GET  /mcp    Streamable HTTP (recommended; modern MCP clients)
  *   GET       /sse    SSE transport (legacy clients)
@@ -28,7 +28,7 @@ export class AkMcp extends McpAgent<Env> {
   }
 }
 
-const LANDING = `${SERVER_NAME} v${SERVER_VERSION} — AK Active Kernel documentation MCP server
+const LANDING = `${SERVER_NAME} v${SERVER_VERSION} - AK Active Kernel documentation MCP server
 
 Connect an MCP client to:
   Streamable HTTP : <this-origin>/mcp

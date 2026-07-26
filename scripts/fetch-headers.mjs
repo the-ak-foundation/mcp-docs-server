@@ -1,5 +1,5 @@
 /**
- * fetch-headers.mjs — refresh the vendored AK kernel headers.
+ * fetch-headers.mjs - refresh the vendored AK kernel headers.
  *
  * This repo is STANDALONE: it does not need the firmware repo checked out. A
  * snapshot of the 7 public kernel headers is committed under vendor/ak-inc/, and
@@ -43,7 +43,7 @@ async function main() {
     join(VENDOR_DIR, "SOURCE.txt"),
     [
       "AK kernel headers vendored for the ak-mcp documentation build.",
-      "Do not edit by hand — refresh with: npm run fetch-headers [<tag>]",
+      "Do not edit by hand - refresh with: npm run fetch-headers [<tag>]",
       "",
       `repo: ${REPO}`,
       `tag:  ${tag}`,

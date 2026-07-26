@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ak-console.py — non-interactive UART bridge for the AK base kit console.
+"""ak-console.py - non-interactive UART bridge for the AK base kit console.
 
 Built for AI agents (and humans) to capture logs and drive the AK shell in one
 shot, with bounded timeouts and clean output: everything the BOARD prints goes
@@ -132,7 +132,7 @@ def main():
         if not (args.cmd or args.key or args.watch):
             die("nothing to do: give --cmd, --key, and/or --watch")
 
-    # Safety gate — pure logic, runs before any dependency or port is touched.
+    # Safety gate - pure logic, runs before any dependency or port is touched.
     for c in args.cmd:
         if is_destructive(c) and not args.allow_destructive:
             die(f'command "{c}" has side effects; re-run with --allow-destructive '

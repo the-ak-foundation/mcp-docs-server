@@ -6,7 +6,7 @@ Tài liệu này dành cho **kỹ sư vibe coding**: cách kết nối AK MCP se
 
 ---
 
-## 0. Trước khi bắt đầu — lấy URL server
+## 0. Trước khi bắt đầu - lấy URL server
 
 Sau khi `npm run deploy`, Cloudflare in ra URL dạng:
 
@@ -25,11 +25,11 @@ https://ak-mcp.<your-account>.workers.dev/sse        ← SSE (client cũ)
 
 ---
 
-## 1. VS Code + GitHub Copilot (Agent mode) — khuyến nghị
+## 1. VS Code + GitHub Copilot (Agent mode) - khuyến nghị
 
 Yêu cầu: **VS Code ≥ 1.102** và extension **GitHub Copilot Chat**. MCP chỉ hoạt động ở **Agent mode**.
 
-### Cách A — qua file `.vscode/mcp.json` (gắn theo dự án)
+### Cách A - qua file `.vscode/mcp.json` (gắn theo dự án)
 
 Tạo file `.vscode/mcp.json` trong thư mục dự án (có sẵn template ở [`examples/vscode-mcp.json`](../examples/vscode-mcp.json)):
 
@@ -46,7 +46,7 @@ Tạo file `.vscode/mcp.json` trong thư mục dự án (có sẵn template ở 
 
 Lưu file → VS Code hiện nút **Start** ngay trên file đó, bấm để kết nối (lần đầu sẽ hỏi Trust, chọn cho phép).
 
-### Cách B — qua Command Palette (gắn theo user, mọi dự án)
+### Cách B - qua Command Palette (gắn theo user, mọi dự án)
 
 `Ctrl/Cmd + Shift + P` → **MCP: Add Server** → **HTTP** → dán URL `/mcp` → đặt tên `ak-docs` → chọn lưu vào *User* hoặc *Workspace*.
 
@@ -60,7 +60,7 @@ Lưu file → VS Code hiện nút **Start** ngay trên file đó, bấm để k�
 
 ## 2. Các công cụ khác (cùng dùng được URL trên)
 
-> Có sẵn file mẫu copy-paste cho từng client trong [`examples/`](../examples/) — xem
+> Có sẵn file mẫu copy-paste cho từng client trong [`examples/`](../examples/) - xem
 > [examples/README.md](../examples/README.md) để biết chép vào đâu. Nhớ thay `<your-account>`.
 
 ### Cursor
@@ -90,7 +90,7 @@ Hoặc đặt [`examples/claude-code.mcp.json`](../examples/claude-code.mcp.json
 ### Claude Desktop
 Chép [`examples/claude-desktop.json`](../examples/claude-desktop.json) vào file cấu hình
 (`%APPDATA%\Claude\claude_desktop_config.json` trên Windows; `~/Library/Application
-Support/Claude/…` trên macOS) — bản mẫu bắc cầu remote qua stdio bằng `mcp-remote` (cần Node).
+Support/Claude/…` trên macOS) - bản mẫu bắc cầu remote qua stdio bằng `mcp-remote` (cần Node).
 Bản Pro/Team có thể thêm trực tiếp qua **Settings → Connectors** (dán URL, không cần cầu nối).
 
 ### OpenAI Codex (CLI + extension)
@@ -101,7 +101,7 @@ codex mcp add ak-docs -- npx -y mcp-remote https://ak-mcp.<your-account>.workers
 ```
 Bản Codex mới hỗ trợ HTTP trực tiếp (`url = "…"`); xem chú thích trong file mẫu.
 
-### Chạy offline (không cần mạng) — stdio cục bộ
+### Chạy offline (không cần mạng) - stdio cục bộ
 Nếu muốn dùng bản local thay vì server remote:
 ```sh
 cd mcp-docs-server && npm install && npm run build
@@ -121,7 +121,7 @@ Rồi trỏ client tới lệnh stdio (ví dụ `.vscode/mcp.json`):
 
 ---
 
-## 3. Chạy thử với một dự án mới — từng bước
+## 3. Chạy thử với một dự án mới - từng bước
 
 Bạn **không cần tự tải** base kit: chỉ mở thư mục trống rồi chat đúng "rule", agent sẽ tự tải bản release mới nhất và tùy biến.
 
@@ -132,9 +132,9 @@ Bạn **không cần tự tải** base kit: chỉ mở thư mục trống rồi 
 5. **Chat rule khởi tạo**, ví dụ: *"Tạo dự án AK mới tên `smart-fan`: đọc cảm biến nhiệt qua ADC và bật quạt khi quá ngưỡng."*
    → agent gọi `start_ak_project` (lấy release mới nhất), chạy lệnh `curl … | tar` để tải + giải nén vào `smart-fan/`, rồi tùy biến theo `get_ak_guide`.
 6. **Duyệt diff**: kiểm tra agent chỉ sửa trong `application/sources/app/` (và `driver/`), không đụng `ak/`, `boot/`, `networks/`, `common/`.
-7. **Build kiểm chứng**: `cd smart-fan/application && make` (xem `CLAUDE.md` trong source vừa tải về toolchain — cần shell Unix/WSL).
+7. **Build kiểm chứng**: `cd smart-fan/application && make` (xem `CLAUDE.md` trong source vừa tải về toolchain - cần shell Unix/WSL).
 
-> Muốn build tái lập (reproducible)? Yêu cầu ghim tag: *"…dùng `ref: v1.3`"* — agent sẽ tải đúng bản đó thay vì "latest".
+> Muốn build tái lập (reproducible)? Yêu cầu ghim tag: *"…dùng `ref: v1.3`"* - agent sẽ tải đúng bản đó thay vì "latest".
 
 ---
 
@@ -187,7 +187,7 @@ Cứ mô tả nhu cầu tự nhiên; với steering file ở trên, agent sẽ t
 - **Tools:** `start_ak_project`, `search_ak_docs`, `get_ak_api`, `list_ak_api`, `get_ak_guide`, `get_ak_guardrails`, `analyze_ak_log`, `decode_ak_lcd`
 - **Guides:** start-project, create-task, create-driver, create-screen, use-timer, isr-bridge, tune-pools, debug-uart-shell, kernel-task-log, agent-workflow
 - **Prompts:** `ak-new-project`, `ak-new-task`, `ak-new-driver`, `ak-debug` (template scaffolding kèm guardrails)
-- **Serial bridge cho agent:** [`examples/ak-console.py`](../examples/ak-console.py) — gửi lệnh shell/bắt log UART không tương tác (cần `pip install pyserial`)
+- **Serial bridge cho agent:** [`examples/ak-console.py`](../examples/ak-console.py) - gửi lệnh shell/bắt log UART không tương tác (cần `pip install pyserial`)
 - **Resources:** `ak://index`, `ak://{section}/{id}` (concept / guide / guardrail / api)
 
 Chi tiết kiến trúc & cách cập nhật tài liệu: [README.md](../README.md).

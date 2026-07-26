@@ -8,7 +8,7 @@ summary: Download the latest ak-base-kit-stm32l151 release, lay it out as a new 
 
 # Recipe: Start a new project from the base kit
 
-Use the **`start_ak_project`** tool to do this end to end — it resolves the *latest* release
+Use the **`start_ak_project`** tool to do this end to end - it resolves the *latest* release
 automatically and returns ready-to-run commands. This guide documents the same flow.
 
 ## 1. Download & extract the latest release
@@ -38,18 +38,18 @@ git clone --depth 1 --branch v1.3 https://github.com/the-ak-foundation/ak-base-k
 ```
 
 > A GitHub tarball for tag `vX.Y` extracts to a folder `ak-base-kit-stm32l151-X.Y` (the leading
-> `v` is dropped) — rename it to your project name.
+> `v` is dropped) - rename it to your project name.
 
 ## 2. Get oriented
 
-- `application/` — the firmware you build (`sources/app/` = tasks & screens, `sources/driver/` = drivers). **Work here.**
-- `boot/` — bootloader (separate image). Leave alone.
-- `application/sources/ak/`, `networks/`, `common/`, `platform/` — framework; do not modify.
+- `application/` - the firmware you build (`sources/app/` = tasks & screens, `sources/driver/` = drivers). **Work here.**
+- `boot/` - bootloader (separate image). Leave alone.
+- `application/sources/ak/`, `networks/`, `common/`, `platform/` - framework; do not modify.
 - Build: Unix-like shell + `arm-none-eabi-gcc` (see the repo `CLAUDE.md`), then `cd application && make`.
 
 ## 3. Customize for the engineer's needs
 
-1. Call **`get_ak_guardrails`** — stay inside `application/sources/app/` and `application/sources/driver/`.
+1. Call **`get_ak_guardrails`** - stay inside `application/sources/app/` and `application/sources/driver/`.
 2. For each feature, call **`get_ak_guide`** (`create-task`, `create-driver`, `create-screen`, `use-timer`, `isr-bridge`) and follow it exactly.
 3. Use **`get_ak_api`** for exact signatures/arguments; **`search_ak_docs`** when unsure of a name.
 4. Rebuild with `make`; check `make info` against the 16 KB RAM budget.

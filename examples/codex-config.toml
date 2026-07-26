@@ -1,4 +1,4 @@
-# Codex — add to ~/.codex/config.toml (the Codex CLI and the Codex IDE extension
+# Codex - add to ~/.codex/config.toml (the Codex CLI and the Codex IDE extension
 # both read this file). Replace <your-account> with your workers.dev subdomain.
 #
 # Reliable on every Codex build that supports MCP: bridge the remote server over
