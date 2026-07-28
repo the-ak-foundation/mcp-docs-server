@@ -9,7 +9,7 @@ apis: task_entry_interrupt, task_exit_interrupt, task_post_pure_msg, task_post_c
 
 # Recipe: Bridge an interrupt to a task
 
-ISRs are **not** tasks. An ISR's job is to capture the event, **post a message**, and return — the real work happens in a task handler at the right priority.
+ISRs are **not** tasks. An ISR's job is to capture the event, **post a message**, and return - the real work happens in a task handler at the right priority.
 
 ## The pattern
 
@@ -34,7 +34,7 @@ void EXTIx_IRQHandler(void) {
 
 ## Periodic hardware tick
 
-The same idea drives time: `timer_tick(elapsed_ms)` is called from the periodic tick ISR and simply posts one `TIMER_TICK` message to the timer task. Driver polling (buttons, LEDs) is invoked from `sys_irq_timer_10ms()` — a 10 ms timer hook — which calls each driver's `*_polling()`.
+The same idea drives time: `timer_tick(elapsed_ms)` is called from the periodic tick ISR and simply posts one `TIMER_TICK` message to the timer task. Driver polling (buttons, LEDs) is invoked from `sys_irq_timer_10ms()` - a 10 ms timer hook - which calls each driver's `*_polling()`.
 
 > You normally do not edit ISRs in `application/sources/ak/` or `sys/`. For a new peripheral, add your IRQ handler in the app/driver layer and follow this bracketing pattern.
 

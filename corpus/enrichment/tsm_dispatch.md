@@ -1,6 +1,6 @@
 ---
 symbol: tsm_dispatch
-summary: Table-driven state dispatch — match msg->sig in the current state's row list, transition if next_state differs, then run the row handler.
+summary: Table-driven state dispatch - match msg->sig in the current state's row list, transition if next_state differs, then run the row handler.
 fatal_codes:
 see_also: tsm_init, tsm_tran, fsm_dispatch
 tags: tsm, state-machine, dispatch, table

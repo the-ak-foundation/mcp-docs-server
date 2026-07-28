@@ -22,7 +22,7 @@ APP_PRINT("dynamic max: %lu\n", get_dynamic_msg_pool_used_max());
 APP_PRINT("timer max:   %lu\n", get_timer_msg_pool_used_max());
 ```
 
-## 2. Set sizes with headroom — `application/sources/ak/ak.cfg.mk`
+## 2. Set sizes with headroom - `application/sources/ak/ak.cfg.mk`
 
 ```make
 PURE_MSG_POOL_SIZE    = -DAK_PURE_MSG_POOL_SIZE=32
@@ -32,7 +32,7 @@ DYNAMIC_MSG_POOL_SIZE = -DAK_DYNAMIC_MSG_POOL_SIZE=8
 TIMER_POOL_SIZE       = -DAK_TIMER_POOL_SIZE=16
 ```
 
-Rule of thumb: `size = observed_max + margin` (e.g. +50%). `ak.cfg.mk` is configuration, not kernel logic — editing it is expected and safe.
+Rule of thumb: `size = observed_max + margin` (e.g. +50%). `ak.cfg.mk` is configuration, not kernel logic - editing it is expected and safe.
 
 ## 3. Know the failure codes
 

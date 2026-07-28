@@ -1,7 +1,7 @@
 import type { Corpus, Doc } from "./types.js";
 
 /**
- * Tokenizer — MUST stay identical to scripts/tokenize.mjs `tokenize`, since the
+ * Tokenizer - MUST stay identical to scripts/tokenize.mjs `tokenize`, since the
  * inverted index is built with that one and queried with this one.
  */
 export function tokenize(text: string): string[] {

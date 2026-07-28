@@ -1,17 +1,17 @@
 ---
 id: state-machines
-title: State Machines — FSM & TSM
+title: State Machines - FSM & TSM
 section: concept
 tags: fsm, tsm, state-machine, state, transition, dispatch, screen
-summary: AK ships two state-machine styles — FSM (state is a function pointer) and TSM (table-driven states/transitions); both dispatch a message to the current state.
+summary: AK ships two state-machine styles - FSM (state is a function pointer) and TSM (table-driven states/transitions); both dispatch a message to the current state.
 apis: fsm_dispatch, tsm_init, tsm_tran, tsm_dispatch
 ---
 
-# State Machines — FSM & TSM
+# State Machines - FSM & TSM
 
 Both styles are dispatched from inside a task handler.
 
-## FSM — state is a function pointer
+## FSM - state is a function pointer
 
 Good for free-form logic and screens.
 
@@ -35,7 +35,7 @@ void state_idle(ak_msg_t* msg) {
 | `FSM_TRAN(me, target_fn)` | transition to another state |
 | `fsm_dispatch(me, msg)` | invoke the current state with `msg` |
 
-## TSM — table-driven
+## TSM - table-driven
 
 Good when transitions are regular and you want them declared as data. Each state is a null-terminated array of `{sig, next_state, handler}` rows; an optional `on_state` callback fires on every transition.
 

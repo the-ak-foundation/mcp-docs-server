@@ -15,10 +15,10 @@ Schedules `sig` to be posted to `des_task_id` after `duty` ticks (milliseconds i
 
 ## Parameters
 
-- `task_id_t des_task_id` — destination task that will receive the signal.
-- `timer_sig_t sig` — the signal to post on expiry.
-- `uint32_t duty` — delay in ticks (ms).
-- `timer_type_t type` — `TIMER_ONE_SHOT` or `TIMER_PERIODIC`.
+- `task_id_t des_task_id` - destination task that will receive the signal.
+- `timer_sig_t sig` - the signal to post on expiry.
+- `uint32_t duty` - delay in ticks (ms).
+- `timer_type_t type` - `TIMER_ONE_SHOT` or `TIMER_PERIODIC`.
 
 ## Example
 

@@ -9,7 +9,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const corpus = JSON.parse(readFileSync(join(ROOT, "generated", "corpus.json"), "utf8"));
 
 /**
- * Reference BM25 — intentionally identical to src/core/search.ts so this test
+ * Reference BM25 - intentionally identical to src/core/search.ts so this test
  * also guards the algorithm the server actually runs. If you change one, change
  * the other.
  */

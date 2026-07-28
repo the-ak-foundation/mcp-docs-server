@@ -9,7 +9,7 @@ apis: timer_set, timer_remove_attr, timer_tick, task_timer_tick
 
 # Software Timers
 
-Timers are how AK expresses "later" — there is no `sleep`. A timer posts a **signal** to a **task** after a **duty** (in ticks; this firmware feeds milliseconds).
+Timers are how AK expresses "later" - there is no `sleep`. A timer posts a **signal** to a **task** after a **duty** (in ticks; this firmware feeds milliseconds).
 
 ## Arming
 
@@ -30,11 +30,11 @@ timer_set(AC_TASK_FW_ID, FW_PACKET_TIMEOUT, 5000, TIMER_ONE_SHOT);
 timer_remove_attr(AC_TASK_FW_ID, FW_PACKET_TIMEOUT);
 ```
 
-`timer_remove_attr` cancels the timer **and** purges any already-posted message with that signal from the task's queue — the safe way to stop a timer, with no late firing.
+`timer_remove_attr` cancels the timer **and** purges any already-posted message with that signal from the task's queue - the safe way to stop a timer, with no late firing.
 
 ## How it works
 
-- `timer_tick(t)` runs in the **hardware tick ISR** (e.g. SysTick). It only accumulates elapsed ticks and posts a single `TIMER_TICK` message to the timer task — it self-throttles so at most one tick message is in flight.
+- `timer_tick(t)` runs in the **hardware tick ISR** (e.g. SysTick). It only accumulates elapsed ticks and posts a single `TIMER_TICK` message to the timer task - it self-throttles so at most one tick message is in flight.
 - `task_timer_tick` (the highest-priority system task) walks the active-timer list, decrements counters, and posts due signals. Periodic timers reload; one-shot timers are removed on fire.
 
 The timer pool size is `AK_TIMER_POOL_SIZE` in `ak.cfg.mk`; exhaustion is `FATAL("MT", 0x30)`.

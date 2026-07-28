@@ -1,5 +1,5 @@
 /**
- * extract.mjs — zero-dependency parser for the AK kernel public headers.
+ * extract.mjs - zero-dependency parser for the AK kernel public headers.
  *
  * Reads application/sources/ak/inc/*.h and emits one "raw API entry" per public
  * symbol (function prototype, #define macro, typedef). Signatures come straight
@@ -17,16 +17,16 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const MCP_ROOT = resolve(SCRIPT_DIR, "..");
 
 const INC_SUBPATH = ["application", "sources", "ak", "inc"];
-/** Committed snapshot of the kernel headers — refresh with scripts/fetch-headers.mjs. */
+/** Committed snapshot of the kernel headers - refresh with scripts/fetch-headers.mjs. */
 const VENDOR_INC = join(MCP_ROOT, "vendor", "ak-inc");
 
 /**
  * Locate the AK kernel headers. This repo is STANDALONE: by default it reads a
  * vendored snapshot (vendor/ak-inc/), so no firmware checkout is needed to build.
  * Resolution order (first existing wins):
- *   1. $AK_INC_DIR                      — exact path to .../ak/inc
- *   2. $AK_FIRMWARE_DIR/application/... — point at a live firmware checkout
- *   3. vendor/ak-inc/                   — the committed snapshot (default)
+ *   1. $AK_INC_DIR                      - exact path to .../ak/inc
+ *   2. $AK_FIRMWARE_DIR/application/... - point at a live firmware checkout
+ *   3. vendor/ak-inc/                   - the committed snapshot (default)
  */
 export function resolveIncDir() {
   const candidates = [];

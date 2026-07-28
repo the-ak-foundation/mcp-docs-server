@@ -3,15 +3,15 @@ id: create-task
 title: "Recipe: Create a new task"
 section: guide
 tags: task, create, recipe, task_list, app_task_table, signal, makefile
-summary: Five steps to add an AK task — register an ID, add a table row with a priority, declare signals, implement the switch handler, and add the source to Makefile.mk.
+summary: Five steps to add an AK task - register an ID, add a table row with a priority, declare signals, implement the switch handler, and add the source to Makefile.mk.
 apis: task_post_pure_msg, timer_set
 ---
 
 # Recipe: Create a new task
 
-A task is `void task_xxx(ak_msg_t* msg)` — a `switch (msg->sig)` handler. Work only in `application/sources/app/`; do not touch the kernel ([guardrails](ak://guardrail/do-not-modify)).
+A task is `void task_xxx(ak_msg_t* msg)` - a `switch (msg->sig)` handler. Work only in `application/sources/app/`; do not touch the kernel ([guardrails](ak://guardrail/do-not-modify)).
 
-## 1. Register an ID — `app/task_list.h`
+## 1. Register an ID - `app/task_list.h`
 
 Add to the task enum **in increasing order, before `AK_TASK_EOT_ID`**, and declare the entry point.
 
@@ -24,7 +24,7 @@ enum {
 extern void task_blink(ak_msg_t*);
 ```
 
-## 2. Add a table row — `app/task_list.cpp`
+## 2. Add a table row - `app/task_list.cpp`
 
 ```c
 const task_t app_task_table[] = {
@@ -36,7 +36,7 @@ const task_t app_task_table[] = {
 
 Pick a priority `LEVEL_1`–`LEVEL_7` (higher = more urgent). UI/heartbeat tasks sit low; time-critical interface tasks sit higher. **Never use `LEVEL_0`** (reserved).
 
-## 3. Declare signals & intervals — `app/app.h`
+## 3. Declare signals & intervals - `app/app.h`
 
 ```c
 #define AC_BLINK_INTERVAL_MS  (500)
@@ -46,7 +46,7 @@ enum {
 };
 ```
 
-## 4. Implement the handler — `app/task_blink.cpp` (+ `app/task_blink.h`)
+## 4. Implement the handler - `app/task_blink.cpp` (+ `app/task_blink.h`)
 
 ```c
 #include "ak.h"

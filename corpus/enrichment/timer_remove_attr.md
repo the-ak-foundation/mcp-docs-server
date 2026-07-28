@@ -1,6 +1,6 @@
 ---
 symbol: timer_remove_attr
-summary: Cancel a timer by (task, sig) AND purge any already-posted expiry message from the task's queue — the safe way to stop a timer.
+summary: Cancel a timer by (task, sig) AND purge any already-posted expiry message from the task's queue - the safe way to stop a timer.
 fatal_codes:
 see_also: timer_set, task_remove_msg
 tags: timer, cancel

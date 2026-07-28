@@ -16,4 +16,4 @@ for (;;) {
 }
 ```
 
-Call it only after `task_init()`, `task_create()`, and `task_polling_create()`, and after hardware init and seed timers/messages. Returns `int` only for signature symmetry — control never comes back.
+Call it only after `task_init()`, `task_create()`, and `task_polling_create()`, and after hardware init and seed timers/messages. Returns `int` only for signature symmetry - control never comes back.

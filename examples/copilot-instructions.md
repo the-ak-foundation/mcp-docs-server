@@ -6,15 +6,15 @@ firmware, so generated code follows kernel conventions and stays out of the core
 Codex: into AGENTS.md.)
 -->
 
-# AK firmware — agent instructions
+# AK firmware - agent instructions
 
 This project is firmware for the **AK (Active Kernel)** event-driven MCU framework.
 
-You have access to the **`ak-docs` MCP server**. Use it as the source of truth — do
+You have access to the **`ak-docs` MCP server**. Use it as the source of truth - do
 not guess AK APIs from memory.
 
 **Starting a new project?** If this is a fresh/empty workspace (no `application/` yet),
-call **`start_ak_project`** first — it downloads the latest base-kit release and gives you
+call **`start_ak_project`** first - it downloads the latest base-kit release and gives you
 the commands to lay it out. Run them, then customize per the steps below.
 
 Before writing or changing any firmware:
@@ -40,7 +40,7 @@ Run only read-only shell commands on your own; destructive ones (`reboot`, `fata
 
 Workflow (see `get_ak_guide("agent-workflow")`):
 
-1. **Develop/debug with `-URELEASE`** — keep `RELEASE_OPTION = -URELEASE` in
+1. **Develop/debug with `-URELEASE`** - keep `RELEASE_OPTION = -URELEASE` in
    `application/Makefile` (its default). A `-DRELEASE` build auto-resets on FATAL and hides
    the interactive fatal mode; only build `-DRELEASE` for the shipping artifact.
 2. **Commit after every finished feature** if the folder is a git repo (`git rev-parse
@@ -54,7 +54,7 @@ Workflow (see `get_ak_guide("agent-workflow")`):
 
 Hard rules (also returned by `get_ak_guardrails`):
 
-- Handlers must be **non-blocking** — no `delay()`, no busy-wait. Use a timer that posts a
+- Handlers must be **non-blocking** - no `delay()`, no busy-wait. Use a timer that posts a
   signal instead.
 - Tasks communicate **only via messages** (`task_post_*`), never direct calls or shared
   globals.

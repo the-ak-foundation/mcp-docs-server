@@ -11,14 +11,14 @@ apis: timer_set, timer_remove_attr
 
 The OLED UI is managed by the screen manager (`application/sources/common/screen_manager.h`). `task_display` forwards every message to the current screen via `scr_mng_dispatch(msg)`. A **screen is an FSM handler** that draws through `view_render`. Reference: `application/sources/app/screens/` (`scr_idle.cpp`, `scr_welcome.cpp`).
 
-## 1. Declare the screen — `app/screens/scr_clock.h` + register in `screens.h`
+## 1. Declare the screen - `app/screens/scr_clock.h` + register in `screens.h`
 
 ```c
 extern view_screen_t scr_clock;
 extern void scr_clock_handle(ak_msg_t* msg);
 ```
 
-## 2. Implement the handler — `app/screens/scr_clock.cpp`
+## 2. Implement the handler - `app/screens/scr_clock.cpp`
 
 ```c
 #include "scr_clock.h"
@@ -67,14 +67,14 @@ void scr_clock_handle(ak_msg_t* msg) {
 
 ## Rules
 
-- **Refresh with a periodic timer**, not a loop — keep the handler short (≤ ~20 FPS).
+- **Refresh with a periodic timer**, not a loop - keep the handler short (≤ ~20 FPS).
 - Always cancel your timers on `SCREEN_EXIT` / when leaving.
 - Mind the 16 KB RAM budget if using STL containers in a screen.
 
 ## Verify the screen (do not skip)
 
 After building/flashing, navigate to the new screen on the device, dump the framebuffer, and
-check it with the **`decode_ak_lcd`** tool — the compiler can't see a mis-laid-out screen:
+check it with the **`decode_ak_lcd`** tool - the compiler can't see a mis-laid-out screen:
 
 ```sh
 python ak-console.py --port <PORT> --cmd "lcd d"    # paste output into decode_ak_lcd

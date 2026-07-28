@@ -1,5 +1,5 @@
 /**
- * build-corpus.mjs — assemble the searchable corpus the MCP server serves.
+ * build-corpus.mjs - assemble the searchable corpus the MCP server serves.
  *
  * Inputs:
  *   - extracted API entries (extract.mjs, from the kernel headers)

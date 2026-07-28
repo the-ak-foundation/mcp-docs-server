@@ -7,7 +7,7 @@ tags: post, low-level
 ---
 ## Semantics
 
-Appends an already-allocated `ak_msg_t*` to `des_task_id`'s priority queue and marks the level ready. Use it when the `task_post_*` helpers don't expose a field you need — typically the external "interface" header (`set_if_*`) for routing a message off-device.
+Appends an already-allocated `ak_msg_t*` to `des_task_id`'s priority queue and marks the level ready. Use it when the `task_post_*` helpers don't expose a field you need - typically the external "interface" header (`set_if_*`) for routing a message off-device.
 
 After posting, **the message belongs to the kernel**: do not read, modify, or free it. It is freed automatically once the destination handler returns.
 

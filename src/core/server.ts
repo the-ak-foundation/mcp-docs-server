@@ -67,7 +67,7 @@ async function resolveRelease(ref?: string): Promise<Release> {
       if (data.tag_name) return { tag: data.tag_name, ...archiveUrls(data.tag_name), origin: "latest" };
     }
   } catch {
-    /* network/rate-limit — fall back to the pinned tag */
+    /* network/rate-limit - fall back to the pinned tag */
   }
   return { tag: AK_DEFAULT_TAG, ...archiveUrls(AK_DEFAULT_TAG), origin: "pinned" };
 }
@@ -82,7 +82,7 @@ function formatBootstrap(projectName: string, rel: Release): string {
       ? `latest release (${rel.tag})`
       : rel.origin === "requested"
         ? `requested release (${rel.tag})`
-        : `pinned fallback (${rel.tag}) — could not reach the GitHub API for the latest`;
+        : `pinned fallback (${rel.tag}) - could not reach the GitHub API for the latest`;
   return [
     `# Bootstrap AK project "${name}"`,
     ``,
@@ -113,9 +113,9 @@ function formatBootstrap(projectName: string, rel: Release): string {
     ``,
     `## 2. Get oriented`,
     ``,
-    `- \`${name}/application/\` — the firmware you build (\`sources/app/\` = tasks & screens, \`sources/driver/\` = drivers). **Work here.**`,
-    `- \`${name}/boot/\` — bootloader (separate image). Leave alone.`,
-    `- Kernel \`application/sources/ak/\`, \`sys/\`, \`networks/\`, \`common/\` are framework — do not modify.`,
+    `- \`${name}/application/\` - the firmware you build (\`sources/app/\` = tasks & screens, \`sources/driver/\` = drivers). **Work here.**`,
+    `- \`${name}/boot/\` - bootloader (separate image). Leave alone.`,
+    `- Kernel \`application/sources/ak/\`, \`sys/\`, \`networks/\`, \`common/\` are framework - do not modify.`,
     `- Build needs a Unix-like shell + arm-none-eabi-gcc; see the repo's \`CLAUDE.md\`. Build with \`cd ${name}/application && make\`.`,
     ``,
     `## 3. Keep this MCP wired for customization`,
@@ -124,12 +124,12 @@ function formatBootstrap(projectName: string, rel: Release): string {
     ``,
     `## 4. Customize for the engineer's needs`,
     ``,
-    `1. Call **\`get_ak_guardrails\`** — only edit \`application/sources/app/\` and \`application/sources/driver/\`.`,
+    `1. Call **\`get_ak_guardrails\`** - only edit \`application/sources/app/\` and \`application/sources/driver/\`.`,
     `2. For each feature, call **\`get_ak_guide\`** (\`create-task\`, \`create-driver\`, \`create-screen\`, …) and follow it exactly.`,
     `3. Use **\`get_ak_api\`** for exact signatures/arguments; **\`search_ak_docs\`** when unsure of a name.`,
     `4. Rebuild with \`make\` and check \`make info\` for the 16 KB RAM budget.`,
     ``,
-    `_Tip: prefer a specific tag for reproducible builds — call this tool again with \`ref: "${rel.tag}"\`._`,
+    `_Tip: prefer a specific tag for reproducible builds - call this tool again with \`ref: "${rel.tag}"\`._`,
   ].join("\n");
 }
 
@@ -140,7 +140,7 @@ export function createAkServer(corpus: Corpus): McpServer {
     {
       instructions:
         "Documentation for the AK (Active Kernel) event-driven MCU framework. " +
-        "To START A NEW PROJECT from the base kit, call `start_ak_project` — it resolves the " +
+        "To START A NEW PROJECT from the base kit, call `start_ak_project` - it resolves the " +
         "latest ak-base-kit-stm32l151 release and returns the exact download/extract commands, " +
         "then customize the extracted source. " +
         "To DEBUG a running board, call `get_ak_guide(\"debug-uart-shell\")` for the UART/shell " +
@@ -150,7 +150,7 @@ export function createAkServer(corpus: Corpus): McpServer {
         "after the final build. " +
         "Use `search_ak_docs` to find anything, `get_ak_api` for exact function/macro " +
         "signatures and arguments, `get_ak_guide` for create-task/create-driver/create-screen " +
-        "recipes, and ALWAYS consult `get_ak_guardrails` before generating code — never modify " +
+        "recipes, and ALWAYS consult `get_ak_guardrails` before generating code - never modify " +
         "the kernel (application/sources/ak), boot, sys, networks, or common; build in app/ and driver/.",
     }
   );
@@ -381,7 +381,7 @@ export function createAkServer(corpus: Corpus): McpServer {
       const art = renderLcdAscii(fb, invert ?? false);
       const png = encodeLcdPng(fb, scale ?? 4, invert ?? false);
       const summaryLines = [
-        `OLED ${fb.width}x${fb.height} — ${describeLcd(fb)}`,
+        `OLED ${fb.width}x${fb.height} - ${describeLcd(fb)}`,
         ...fb.warnings.map((w) => `warning: ${w}`),
         "",
         "```",
@@ -487,7 +487,7 @@ export function createAkServer(corpus: Corpus): McpServer {
                 : "") +
               ` to resolve the latest base kit and get the download commands.\n` +
               `2) Run those commands to download and extract the source into the project folder.\n` +
-              `3) Call \`get_ak_guardrails\` — only edit application/sources/app/ and .../driver/.\n` +
+              `3) Call \`get_ak_guardrails\` - only edit application/sources/app/ and .../driver/.\n` +
               `4) Implement the feature above using \`get_ak_guide\` / \`get_ak_api\`, then build with make.\n` +
               `Output the commands you run and the resulting diffs.`,
           },
@@ -549,7 +549,7 @@ function renderIndex(corpus: Corpus): string {
     lines.push(`## ${title}`);
     for (const id of ids) {
       const doc = corpus.documents.find((d) => d.section === section && d.id === id);
-      if (doc) lines.push(`- [${doc.title}](${doc.uri})${"summary" in doc && doc.summary ? ` — ${doc.summary}` : ""}`);
+      if (doc) lines.push(`- [${doc.title}](${doc.uri})${"summary" in doc && doc.summary ? ` - ${doc.summary}` : ""}`);
     }
     lines.push("");
   };

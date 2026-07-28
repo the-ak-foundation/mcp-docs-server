@@ -1,17 +1,17 @@
-# ak-mcp — AK Active Kernel documentation MCP server
+# AK Active Kernel documentation MCP server
 
 A free, public **[Model Context Protocol](https://modelcontextprotocol.io) server** that gives AI coding tools accurate, queryable documentation for the **AK (Active Kernel)** event-driven MCU framework (firmware: [`ak-base-kit-stm32l151`](https://github.com/the-ak-foundation/ak-base-kit-stm32l151)).
 
 It lets an AI assistant:
 
-- understand the AK kernel core (scheduler, message pools, timers, FSM/TSM),
-- look up exact **API signatures and arguments** (extracted straight from the headers, so they never drift),
-- follow the **rules & format** for creating tasks, drivers, and screens,
-- design new tasks/drivers **without touching** the kernel, boot, sys, networks, or common code.
+- Understand the AK kernel core (scheduler, message pools, timers, FSM/TSM),
+- Look up exact **API signatures and arguments** (extracted straight from the headers, so they never drift),
+- Follow the **rules & format** for creating tasks, drivers, and screens,
+- Design new tasks/drivers **without touching** the kernel, boot, sys, networks, or common code.
 
 ## How it works
 
-This repo is **standalone** — the kernel headers are vendored (committed) under
+This repo is **standalone** - the kernel headers are vendored (committed) under
 `vendor/ak-inc/`, so nothing else needs to be cloned to build it.
 
 ```
@@ -42,7 +42,7 @@ Signatures come from the vendored kernel headers; semantics/examples are layered
 | `analyze_ak_log(log, context?)` | paste raw UART output → structured diagnosis: FATAL cause/fix, timing (run-to-completion/starvation), reboot loops, next shell commands |
 | `decode_ak_lcd(dump, scale?, invert?)` | paste a `lcd d` framebuffer dump → the OLED screen rendered as text art **and a PNG image**, with blank/bounding-box stats |
 
-**Prompts:** `ak-new-project`, `ak-new-task`, `ak-new-driver`, `ak-debug` — guided scaffolding/debugging that enforces conventions and guardrails.
+**Prompts:** `ak-new-project`, `ak-new-task`, `ak-new-driver`, `ak-debug` - guided scaffolding/debugging that enforces conventions and guardrails.
 
 **Debugging loop:** the board's only debug surface is its 115200 UART console (leveled printf
 + an interactive shell). Agents capture it non-interactively with
@@ -57,7 +57,7 @@ pinned `v1.3` if the API is unreachable), so new projects always start from the 
 ## Kernel headers (vendored)
 
 The build reads the AK kernel's public headers, which are **committed** under `vendor/ak-inc/`
-(a snapshot of a firmware release tag — see `vendor/ak-inc/SOURCE.txt`). Cloning this repo is
+(a snapshot of a firmware release tag - see `vendor/ak-inc/SOURCE.txt`). Cloning this repo is
 enough to build it: **no firmware checkout required.**
 
 Refresh the snapshot when the kernel changes:
@@ -68,14 +68,14 @@ npm run fetch-headers v1.4       # a specific release tag
 ```
 
 then `npm run build:corpus` and commit `vendor/ak-inc/`. Header resolution order (first
-existing wins) — override only if you want to build against a live firmware checkout:
+existing wins) - override only if you want to build against a live firmware checkout:
 
-1. `$AK_INC_DIR` — exact path to `.../application/sources/ak/inc`
-2. `$AK_FIRMWARE_DIR/application/sources/ak/inc` — a firmware repo root
-3. `vendor/ak-inc/` — the committed snapshot (default)
+1. `$AK_INC_DIR` - exact path to `.../application/sources/ak/inc`
+2. `$AK_FIRMWARE_DIR/application/sources/ak/inc` - a firmware repo root
+3. `vendor/ak-inc/` - the committed snapshot (default)
 
 Once `generated/corpus.json` is built, the running server (stdio or Worker) needs **nothing**
-external — the corpus is self-contained.
+external - the corpus is self-contained.
 
 ## Develop
 
@@ -87,7 +87,7 @@ npm test                 # extractor, corpus integrity, and search ranking (no d
 npm run typecheck        # core + cli
 ```
 
-The corpus pipeline (`scripts/*.mjs`) and tests are **zero-dependency** and run on plain Node ≥ 20 — no install required for `npm run build:corpus` / `node --test` (only the firmware headers must be reachable as above).
+The corpus pipeline (`scripts/*.mjs`) and tests are **zero-dependency** and run on plain Node ≥ 20 - no install required for `npm run build:corpus` / `node --test` (only the firmware headers must be reachable as above).
 
 ## Run locally (stdio)
 

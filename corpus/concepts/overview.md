@@ -1,13 +1,13 @@
 ---
 id: overview
-title: AK Active Kernel — Overview
+title: AK Active Kernel - Overview
 section: concept
 tags: ak, active-object, event-driven, mcu, stm32l151
 summary: AK is a cooperative, event-driven kernel where tasks communicate only via messages carrying signals, driven by timers and structured as state machines.
 apis: task_run, task_post_pure_msg, timer_set
 ---
 
-# AK Active Kernel — Overview
+# AK Active Kernel - Overview
 
 AK is a tiny **cooperative, event-driven kernel** for microcontrollers (this codebase targets the STM32L151CBT6: Cortex-M3, 128 KB flash, 16 KB RAM). Firmware is structured as a set of **tasks** (active objects) that:
 
@@ -29,10 +29,10 @@ The cost: a long-running handler delays everything below it. Keep handlers short
 
 ## The four pillars
 
-1. **Tasks** — `void task_xxx(ak_msg_t* msg)`, registered in `app_task_table[]` with an ID and a priority. See [scheduler](ak://concept/scheduler).
-2. **Messages & signals** — three pools (pure / common / dynamic), reference-counted, auto-freed. See [messages](ak://concept/messages).
-3. **Timers** — one-shot or periodic software timers. See [timers](ak://concept/timers).
-4. **State machines** — FSM (function-pointer state) and TSM (table-driven). See [state-machines](ak://concept/state-machines).
+1. **Tasks** - `void task_xxx(ak_msg_t* msg)`, registered in `app_task_table[]` with an ID and a priority. See [scheduler](ak://concept/scheduler).
+2. **Messages & signals** - three pools (pure / common / dynamic), reference-counted, auto-freed. See [messages](ak://concept/messages).
+3. **Timers** - one-shot or periodic software timers. See [timers](ak://concept/timers).
+4. **State machines** - FSM (function-pointer state) and TSM (table-driven). See [state-machines](ak://concept/state-machines).
 
 ## Where things live
 

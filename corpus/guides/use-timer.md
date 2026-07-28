@@ -18,7 +18,7 @@ Timers replace blocking delays. They post a **signal** to a **task** after a dut
 timer_set(AC_TASK_SENSOR_ID, AC_SENSOR_SAMPLE, 250, TIMER_PERIODIC);
 ```
 
-A periodic timer keeps firing until you cancel it — the handler does **not** need to re-arm.
+A periodic timer keeps firing until you cancel it - the handler does **not** need to re-arm.
 
 ## One-shot timeout (the classic request/timeout pattern)
 
@@ -45,8 +45,8 @@ case AC_REQ_TIMEOUT:                      // no reply
 
 ## Don't
 
-- Don't `timer_set` the same `(task, sig)` for two different logical purposes — they collide.
+- Don't `timer_set` the same `(task, sig)` for two different logical purposes - they collide.
 - Don't assume sub-millisecond precision; resolution is the hardware tick.
-- Don't leak timers — cancel periodic timers when a task/screen leaves its active state. Pool size is `AK_TIMER_POOL_SIZE`; exhaustion is `FATAL("MT", 0x30)`.
+- Don't leak timers - cancel periodic timers when a task/screen leaves its active state. Pool size is `AK_TIMER_POOL_SIZE`; exhaustion is `FATAL("MT", 0x30)`.
 
 See also: [timers](ak://concept/timers).

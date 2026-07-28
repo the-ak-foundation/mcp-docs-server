@@ -1,5 +1,5 @@
 /**
- * tokenize.mjs — the single source of truth for tokenization.
+ * tokenize.mjs - the single source of truth for tokenization.
  *
  * Used by build-corpus.mjs (to build the inverted index) and by the tests.
  * src/core/search.ts keeps a TypeScript mirror of this function; the two MUST

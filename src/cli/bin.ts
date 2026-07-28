@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ak-mcp — stdio MCP server for local / offline use.
+ * ak-mcp - stdio MCP server for local / offline use.
  *
  * Configure in an MCP client (Claude Desktop, Cursor, …):
  *   { "mcpServers": { "ak": { "command": "npx", "args": ["-y", "ak-mcp"] } } }
@@ -27,7 +27,7 @@ async function main(): Promise<void> {
   const server = createAkServer(corpus);
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  // stdout is the MCP channel — log to stderr only.
+  // stdout is the MCP channel - log to stderr only.
   console.error(
     `ak-mcp v${SERVER_VERSION} ready (stdio): ${corpus.documents.length} docs, ` +
       `${corpus.source.symbols} symbols.`

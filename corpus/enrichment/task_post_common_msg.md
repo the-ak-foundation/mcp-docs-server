@@ -11,10 +11,10 @@ Allocates a common message, copies `len` bytes of `data` into its inline buffer,
 
 ## Parameters
 
-- `task_id_t des_task_id` — destination task.
-- `uint8_t sig` — the signal.
-- `uint8_t* data` — pointer to the bytes to copy.
-- `uint8_t len` — number of bytes, **must be ≤ `AK_COMMON_MSG_DATA_SIZE` (64)**.
+- `task_id_t des_task_id` - destination task.
+- `uint8_t sig` - the signal.
+- `uint8_t* data` - pointer to the bytes to copy.
+- `uint8_t len` - number of bytes, **must be ≤ `AK_COMMON_MSG_DATA_SIZE` (64)**.
 
 ## Example
 

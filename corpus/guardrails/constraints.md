@@ -3,7 +3,7 @@ id: constraints
 title: "Guardrail: Kernel constraints & invariants"
 section: guardrail
 tags: guardrail, constraints, no-blocking, ram, priority, ref-count, fatal, invariants
-summary: Hard rules every AK task must respect — no blocking, run-to-completion, fixed pools, 64-byte common payload, max 7 refs, priority 0 reserved, 16 KB RAM budget.
+summary: Hard rules every AK task must respect - no blocking, run-to-completion, fixed pools, 64-byte common payload, max 7 refs, priority 0 reserved, 16 KB RAM budget.
 ---
 
 # Guardrail: Kernel constraints & invariants
@@ -21,16 +21,16 @@ Code generated for AK must respect these or it will fail at runtime (often via `
 
 | Invariant | Value | Violation |
 | --- | --- | --- |
-| Common message payload | ≤ `AK_COMMON_MSG_DATA_SIZE` (64 B) | `FATAL("MF", 0x24)` — use a dynamic message |
+| Common message payload | ≤ `AK_COMMON_MSG_DATA_SIZE` (64 B) | `FATAL("MF", 0x24)` - use a dynamic message |
 | Message reference count | ≤ 7 | `FATAL("MF", 0x61)` |
 | Task priority | `LEVEL_1`–`LEVEL_7`; **0 reserved** | scheduling corruption |
 | User signal base | starts at `AK_USER_DEFINE_SIG` (10) | collides with kernel signals |
-| Pools | fixed at compile time | exhaustion is `FATAL` — size via [tune-pools](ak://guide/tune-pools) |
+| Pools | fixed at compile time | exhaustion is `FATAL` - size via [tune-pools](ak://guide/tune-pools) |
 | RAM budget | 16 KB total | watch STL/heap use; check `make info` |
 
 ## Allocation never returns NULL
 
-`get_pure_msg()` / `get_common_msg()` / `get_dynamic_msg()` do not return NULL — they `FATAL` on exhaustion. So you never null-check them; instead you size the pools correctly.
+`get_pure_msg()` / `get_common_msg()` / `get_dynamic_msg()` do not return NULL - they `FATAL` on exhaustion. So you never null-check them; instead you size the pools correctly.
 
 ## FATAL quick reference
 

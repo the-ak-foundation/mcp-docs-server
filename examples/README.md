@@ -60,7 +60,7 @@ codex mcp add ak-docs -- npx -y mcp-remote https://ak-mcp.<your-account>.workers
 Open the Cline panel → **MCP Servers** icon → **Configure MCP Servers** (this opens
 `cline_mcp_settings.json`), then paste the contents of
 [`cline-mcp-settings.json`](cline-mcp-settings.json). It uses `type: "streamableHttp"` and
-**auto-approves** the five read-only tools (safe — this server only reads docs).
+**auto-approves** the five read-only tools (safe - this server only reads docs).
 
 ---
 

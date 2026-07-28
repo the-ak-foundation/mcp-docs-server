@@ -24,7 +24,7 @@ enum {
 
 ## The three pools
 
-Allocation comes from fixed-size pools (deterministic, no fragmentation). Allocation **never returns NULL** — exhaustion is a `FATAL`, so size pools for the worst case.
+Allocation comes from fixed-size pools (deterministic, no fragmentation). Allocation **never returns NULL** - exhaustion is a `FATAL`, so size pools for the worst case.
 
 | Helper | Backing | Payload | Use when |
 | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ set_msg_sig(m, AC_IF_COMMON_MSG_OUT);
 set_if_des_task_id(m, remote_task);
 set_if_sig(m, REMOTE_CMD);
 set_data_common_msg(m, buf, len);
-task_post(AC_TASK_IF_ID, m);     // hand off; do NOT free — the kernel frees it
+task_post(AC_TASK_IF_ID, m);     // hand off; do NOT free - the kernel frees it
 ```
 
 ## Lifetime & reference counting
@@ -60,6 +60,6 @@ For fan-out (deliver to several tasks, or keep beyond the handler):
 | `msg_dec_ref_count(msg)` | release a reference |
 | `msg_free(msg)` | decrement and free at zero (what the scheduler calls) |
 
-> `ref_count` packs the pool type in its top 2 bits — always use the helpers / `get_msg_*` macros, never read the byte directly.
+> `ref_count` packs the pool type in its top 2 bits - always use the helpers / `get_msg_*` macros, never read the byte directly.
 
 See also: [scheduler](ak://concept/scheduler), [guide: tune-pools](ak://guide/tune-pools).
