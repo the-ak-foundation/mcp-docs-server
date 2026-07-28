@@ -9,7 +9,7 @@ It lets an AI assistant:
 - Follow the **rules & format** for creating tasks, drivers, and screens,
 - Design new tasks/drivers **without touching** the kernel, boot, sys, networks, or common code.
 
-<span style="color:red">**Deeply understanding your product is the root of automation success !** </span>.
+<code style="color : red">**Deeply understanding your product is the root of automation success !** </code>
 
 [<img src="images/ak-active-kernel-documentation-mcp-server-1280-640-px.png" width="960"/>](<https://epcb.vn/products/ak-embedded-base-kit-lap-trinh-nhung-vi-dieu-khien-mcu>)
 
