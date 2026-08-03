@@ -64,6 +64,20 @@ test("sys directory is covered by the do-not-modify guardrail", () => {
   assert.match(doc.body, /application\/sources\/sys\//);
 });
 
+test("io_cfg and task_* naming rules live in the do-not-modify guardrail", () => {
+  const doc = corpus.documents.find((d) => d.id === "do-not-modify");
+  assert.match(doc.body, /io_cfg\.c/);
+  assert.match(doc.body, /task_\*/);
+});
+
+test("a GPIO/pin question surfaces the io_cfg rule", () => {
+  const ids = search("where do I add a new gpio pin io_cfg driver").slice(0, 5).map((r) => r.doc.id);
+  assert.ok(
+    ids.includes("do-not-modify") || ids.includes("create-driver"),
+    `got: ${ids.join(", ")}`
+  );
+});
+
 test("debugging over uart finds the debug guide", () => {
   const ids = search("debug uart shell log").slice(0, 5).map((r) => r.doc.id);
   assert.ok(ids.includes("debug-uart-shell"), `got: ${ids.join(", ")}`);

@@ -87,11 +87,20 @@ Then seed the first message/timer (e.g. in `app_start_timer()` in `app/app.cpp`)
 timer_set(AC_TASK_BLINK_ID, AC_BLINK_TICK, AC_BLINK_INTERVAL_MS, TIMER_PERIODIC);
 ```
 
+## Naming rule: `task_*` is reserved for tasks
+
+The `task_` prefix — on both the file (`task_blink.cpp/.h`) and the handler function
+(`task_blink`) — means **"an AK task registered in `task_list.h`"** and nothing else. Do not
+prefix helpers, screens, drivers, or IO with `task_`. Use `scr_*` for screens, `<device>_*` for
+drivers, `io_*` for board IO, and `<feature>_*` for helpers. This keeps the task list, the code,
+and the debug logs (`taskID`, `-SIG->`) unambiguous. (See [guardrails](ak://guardrail/do-not-modify).)
+
 ## Checklist
 
 - [ ] ID added before `AK_TASK_EOT_ID`, increasing order
 - [ ] Row in `app_task_table[]` with a `LEVEL_1..7` priority
 - [ ] Signals start at `AK_USER_DEFINE_SIG`
+- [ ] File + handler named `task_<name>` (prefix reserved for tasks only)
 - [ ] Handler is non-blocking (no `delay`, no spin loops)
 - [ ] Source added to `app/Makefile.mk`
 - [ ] Task triggered (timer, seed message, or another task)

@@ -74,16 +74,34 @@ Then add one line to `application/sources/driver/Makefile.mk`:
 include sources/driver/relay/Makefile.mk
 ```
 
-## 2. Provide the hardware functions (BSP)
+## 2. Put the pin functions in `io_cfg.c` (the board IO layer)
 
-The concrete pin functions and the instance live in **app code** (`app_bsp.cpp` / `app.cpp`) - *reuse* the existing `sys_io`/`io_cfg_*` functions or the Arduino shim (`pinMode`/`digitalWrite`); **do not edit `sys/`** ([guardrails](ak://guardrail/do-not-modify)). Following the `led_life` / `btn_*` pattern:
+**All GPIO/register code lives in `application/sources/platform/stm32l/io_cfg.c`** — never in
+the driver, never inline in the app ([guardrails](ak://guardrail/do-not-modify)). This is the
+platform seam: porting to another MCU means rewriting only `io_cfg.*`. Add the pin-map macros to
+`io_cfg.h` and the `io_*` functions to `io_cfg.c`, exactly like the stock `led_life_*` /
+`io_button_*` functions:
+
+```c
+/* io_cfg.h — pin map */
+#define RELAY_FAN_IO_PIN     (GPIO_Pin_5)
+#define RELAY_FAN_IO_PORT    (GPIOA)
+#define RELAY_FAN_IO_CLOCK   (RCC_AHBPeriph_GPIOA)
+extern void relay_fan_init();
+extern void relay_fan_on();
+extern void relay_fan_off();
+
+/* io_cfg.c — the ONLY place that touches the register */
+void relay_fan_init() { /* RCC clock + GPIO_Init as output */ }
+void relay_fan_on()   { GPIO_SetBits(RELAY_FAN_IO_PORT, RELAY_FAN_IO_PIN); }
+void relay_fan_off()  { GPIO_ResetBits(RELAY_FAN_IO_PORT, RELAY_FAN_IO_PIN); }
+```
+
+Then in **app code** (`app_bsp.cpp` / `app.cpp`) only create the instance and **inject** those
+functions — no register access here:
 
 ```c
 relay_t relay_fan;
-static void relay_fan_init() { /* io_cfg pin as output */ }
-static void relay_fan_on()   { /* GPIO set   */ }
-static void relay_fan_off()  { /* GPIO reset */ }
-
 /* in main_app(): */
 relay_init(&relay_fan, relay_fan_init, relay_fan_on, relay_fan_off);
 ```
@@ -108,8 +126,9 @@ This is the bridge from hardware into the event-driven world: **drivers post mes
 - [ ] Driver under `driver/<name>/` with `<name>.h/.c` + `Makefile.mk`
 - [ ] Handle struct holds `pf_*` function pointers (no hardcoded pins in the driver)
 - [ ] `include`d from `driver/Makefile.mk`
-- [ ] Hardware functions + instance live in BSP/app code, injected via `*_init(...)`
+- [ ] **GPIO/pin functions defined in `platform/stm32l/io_cfg.c` (macros in `io_cfg.h`)** — not in the driver or app
+- [ ] App only creates the instance and injects the `io_*` functions via `*_init(...)`
 - [ ] Periodic work hooked into `sys_irq_timer_10ms()`; callbacks only `task_post_*`
-- [ ] Kernel / `boot` / `networks` / `common` untouched
+- [ ] Kernel / `boot` / `sys` / `networks` / `common` untouched
 
 See also: [isr-bridge](ak://guide/isr-bridge), [create-task](ak://guide/create-task).

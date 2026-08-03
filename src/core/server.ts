@@ -151,7 +151,9 @@ export function createAkServer(corpus: Corpus): McpServer {
         "Use `search_ak_docs` to find anything, `get_ak_api` for exact function/macro " +
         "signatures and arguments, `get_ak_guide` for create-task/create-driver/create-screen " +
         "recipes, and ALWAYS consult `get_ak_guardrails` before generating code - never modify " +
-        "the kernel (application/sources/ak), boot, sys, networks, or common; build in app/ and driver/.",
+        "the kernel (application/sources/ak), boot, sys, networks, or common; build in app/ and driver/. " +
+        "Put all GPIO/pin code only in platform/stm32l/io_cfg.c, and reserve the task_* prefix for " +
+        "AK tasks registered in task_list.h.",
     }
   );
 

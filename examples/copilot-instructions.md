@@ -61,3 +61,8 @@ Hard rules (also returned by `get_ak_guardrails`):
 - User signals start at `AK_USER_DEFINE_SIG` (10); task priorities are `LEVEL_1..7`
   (0 is reserved).
 - Common message payload ≤ 64 bytes; max 7 references per message; pools are fixed size.
+- **All GPIO/pin/register code goes in `application/sources/platform/stm32l/io_cfg.c`** (macros
+  in `io_cfg.h`) — the only editable file under `platform/`. Drivers hold function pointers; the
+  app injects the `io_*` functions. No pin access in a driver or app file (keeps ports easy).
+- The **`task_*` prefix is reserved** for AK tasks registered in `task_list.h` (file + function).
+  Use `scr_*` (screens), `<device>_*` (drivers), `io_*` (board IO), `<feature>_*` (helpers).
